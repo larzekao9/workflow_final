@@ -1,0 +1,50 @@
+services:
+  ia:
+    build:
+      context: ./backend/IA
+    container_name: ia
+    restart: unless-stopped
+    expose:
+      - "5000"
+
+  tf:
+    build:
+      context: ./backend/Tensorflow
+    container_name: tf
+    restart: unless-stopped
+    expose:
+      - "8001"
+
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    restart: unless-stopped
+    expose:
+      - "8080"
+    depends_on:
+      - ia
+      - tf
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      AWS_BUCKET_NAME: ${AWS_BUCKET_NAME}
+      AWS_KEY_PREFIX: ${AWS_KEY_PREFIX}
+      CLAUDE_API_KEY: ${CLAUDE_API_KEY}
+      FIREBASE_SERVICE_ACCOUNT: ${FIREBASE_SERVICE_ACCOUNT}
+      AI_BASE_URL: http://ia:5000
+      TF_BASE_URL: http://tf:8001
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
