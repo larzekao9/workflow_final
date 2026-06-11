@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../core/services/auth.service';
+import { NetworkStatusService } from '../core/services/network-status.service';
 
 const NAV_ITEM = `
   flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium
@@ -117,12 +118,19 @@ const NAV_ACTIVE = 'bg-indigo-500/15 !text-indigo-300';
 
       <!-- Main content -->
       <main class="flex flex-1 flex-col overflow-y-auto bg-base">
+        @if (!network.online()) {
+          <div class="flex items-center gap-2 bg-amber-500/15 border-b border-amber-500/20 px-5 py-2.5 text-sm text-amber-400">
+            <mat-icon class="!h-4 !w-4 !text-base shrink-0">wifi_off</mat-icon>
+            Sin conexión — mostrando datos guardados previamente
+          </div>
+        }
         <router-outlet />
       </main>
     </div>
   `
 })
 export class ShellComponent {
-  auth = inject(AuthService);
+  auth    = inject(AuthService);
+  network = inject(NetworkStatusService);
   navClass = `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-150 cursor-pointer hover:bg-white/5 hover:text-slate-100`;
 }
