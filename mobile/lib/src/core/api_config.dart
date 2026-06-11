@@ -6,8 +6,8 @@ class ApiConfig {
     'API_BASE_URL',
     defaultValue: '',
   );
-  static const String _androidEmulatorUrl = 'http://10.0.2.2:8080/api';
-  static const String _localNetworkUrl = 'http://192.168.100.65:8080/api';
+  static const String _androidEmulatorUrl = 'http://10.0.2.2/api';
+  static const String _localNetworkUrl = 'http://192.168.100.65/api';
 
   static String get baseUrl {
     if (_envBaseUrl.isNotEmpty) {
