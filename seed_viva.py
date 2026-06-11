@@ -58,6 +58,23 @@ def put(url, token, body):
         return None
     return r.json()
 
+def upload_file(token, file_path, workflow_id):
+    """Sube un archivo usando el endpoint legacy (workflowId). Devuelve metadata para formData."""
+    with open(file_path, "rb") as f:
+        ext = os.path.splitext(file_path)[1].lower()
+        mime = {
+            ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ".pdf":  "application/pdf",
+        }.get(ext, "application/octet-stream")
+        files_data = {"file": (os.path.basename(file_path), f, mime)}
+        data       = {"workflowId": workflow_id}
+        r = requests.post(f"{BASE}/files/upload", files=files_data, data=data, headers=h(token))
+    if not r.ok:
+        print(f"  ERROR upload {r.status_code}: {r.text[:120]}")
+        return None
+    return r.json()
+
 # ── Generar documentos de ejemplo ────────────────────────────────────────────
 def gen_docs(out_dir="/tmp/viva_docs"):
     os.makedirs(out_dir, exist_ok=True)
@@ -233,93 +250,189 @@ def crear_formularios(token):
     return True
 
 # ── 2. Crear trámites de ejemplo ──────────────────────────────────────────────
-def crear_tramites(token):
-    print("\n[2] Creando trámites de ejemplo...")
+WF_INCIDENCIA_NAME = "Atención de Incidencia de Internet"
 
-    tramites = [
-        # Trámite 1: queda en Recepción (PENDIENTE)
+def crear_tramites(token):
+    print("\n[2] Creando trámites variados (PENDIENTE / EN_PROGRESO / COMPLETADO / RECHAZADO)...")
+
+    # Generar documentos si no existen
+    docs_dir = "/tmp/viva_docs"
+    doc_reporte = f"{docs_dir}/reporte_incidencia.docx"
+    doc_diag    = f"{docs_dir}/diagnostico_tecnico.xlsx"
+    doc_contrato = f"{docs_dir}/contrato_servicio.docx"
+    if not os.path.exists(doc_reporte):
+        gen_docs(docs_dir)
+
+    # Pre-cargar documentos al servidor (se usan en varios trámites)
+    print("  Subiendo documentos de ejemplo...")
+    file_reporte  = upload_file(token, doc_reporte,  WF_INCIDENCIA)
+    file_diag     = upload_file(token, doc_diag,     WF_INCIDENCIA)
+    file_contrato = upload_file(token, doc_contrato, WF_INCIDENCIA)
+    if file_reporte:  print(f"    OK: {file_reporte.get('fileName')}")
+    if file_diag:     print(f"    OK: {file_diag.get('fileName')}")
+    if file_contrato: print(f"    OK: {file_contrato.get('fileName')}")
+
+    def fd(nombre, tel, dir_, falla, desc, evidencia=None, reporte=None):
+        d = {
+            "Nombre del cliente": nombre, "Teléfono": tel,
+            "Dirección": dir_, "Tipo de falla": falla,
+            "Descripción del problema": desc,
+        }
+        if evidencia: d["Adjuntar evidencia"] = evidencia
+        if reporte:   d["Reporte técnico"]    = reporte
+        return d
+
+    specs = [
+        # ── PENDIENTE: recién creados, no han avanzado del nodo Inicio ──────
         {
-            "workflowId": WF_INCIDENCIA,
-            "title": "Sin internet - Edificio Norte piso 2",
-            "description": "Cliente reporta pérdida total de conexión",
-            "formData": {
-                "Nombre del cliente": "Roberto Mamani",
-                "Teléfono": "71234567",
-                "Dirección": "Av. Arce 1234 Piso 2",
-                "Tipo de falla": "Sin señal",
-                "Descripción del problema": "Sin internet desde las 8am, equipo con luz roja",
-            },
+            "title": "Nueva solicitud - Edificio Central",
+            "description": "Cliente recién reportó falla, pendiente de recepción",
+            "formData": fd("Luis Mamani","71100001","Av. Camacho 123","Sin señal","Sin internet desde esta mañana"),
+            "autoTransitionIds": [],
+            "_post": None,
+        },
+        {
+            "title": "Falla red Wi-Fi - Sala Conferencias",
+            "description": "Sala de reuniones sin conectividad",
+            "formData": fd("Sofía Ríos","71100002","Calle Mercado 45","Wi-Fi caído","Todos los dispositivos sin conexión"),
+            "autoTransitionIds": [],
+            "_post": None,
+        },
+        # ── EN_PROGRESO en Recepción: tomaron el primer paso ─────────────────
+        {
+            "title": "Lentitud extrema - Piso 5",
+            "description": "Velocidad insuficiente para trabajar",
+            "formData": fd("Marco Apaza","71100003","Edificio Hansa Piso 5","Velocidad baja",
+                           "Descarga máxima de 0.5 Mbps todo el día",
+                           evidencia=file_contrato),
             "autoTransitionIds": [T_INICIO_TO_RECEP],
+            "_post": None,
         },
-        # Trámite 2: avanza a Diagnóstico Técnico (EN_PROGRESO)
         {
-            "workflowId": WF_INCIDENCIA,
-            "title": "Velocidad muy baja - Oficina Central",
-            "description": "Velocidad bajó de 100 a 2 Mbps",
-            "formData": {
-                "Nombre del cliente": "Ana Quispe",
-                "Teléfono": "79876543",
-                "Dirección": "Calle Loayza 456",
-                "Tipo de falla": "Velocidad baja",
-                "Descripción del problema": "La velocidad bajó drásticamente ayer en la tarde",
-            },
+            "title": "Sin señal ONT - Zona Oeste",
+            "description": "Equipo óptico sin sincronización",
+            "formData": fd("Patricia Huanca","71100004","Zona Oeste Calle 3 #77","Sin señal ONT",
+                           "Luz roja permanente en el ONT"),
+            "autoTransitionIds": [T_INICIO_TO_RECEP],
+            "_post": None,
+        },
+        # ── EN_PROGRESO en Diagnóstico Técnico (con reporte adjunto) ─────────
+        {
+            "title": "Intermitencia señal - Torre B",
+            "description": "Cortes frecuentes cada media hora",
+            "formData": fd("Jorge Condori","71100005","Torres Sofer Torre B Piso 8","Intermitencia",
+                           "Servicio se corta exactamente a las horas",
+                           evidencia=file_reporte, reporte=file_diag),
             "autoTransitionIds": [T_INICIO_TO_RECEP, T_RECEP_TO_DIAG],
+            "_post": None,
         },
-        # Trámite 3: avanza a Diagnóstico Técnico
         {
-            "workflowId": WF_INCIDENCIA,
-            "title": "Corte intermitente - Zona Sur",
-            "description": "El servicio se corta cada 30 minutos",
-            "formData": {
-                "Nombre del cliente": "Carlos Flores",
-                "Teléfono": "76543210",
-                "Dirección": "Zona Sur Calle 5 #89",
-                "Tipo de falla": "Intermitencia",
-                "Descripción del problema": "Corte cada 30 min aproximadamente, se reinicia solo",
-            },
+            "title": "Caída total - Área Industrial",
+            "description": "Empresa sin internet desde ayer",
+            "formData": fd("Empresa XYZ SRL","71100006","Parque Industrial Norte #12","Corte total",
+                           "Sin servicio, afecta operaciones críticas",
+                           evidencia=file_reporte),
             "autoTransitionIds": [T_INICIO_TO_RECEP, T_RECEP_TO_DIAG],
+            "_post": None,
         },
-        # Trámite 4: llega a Cierre (resuelto)
+        # ── EN_PROGRESO en Cierre (decisión: aceptar, pendiente de cerrar) ───
         {
-            "workflowId": WF_INCIDENCIA,
-            "title": "Sin internet - Edificio Sur",
-            "description": "Falla en splitter de distribución",
-            "formData": {
-                "Nombre del cliente": "María López",
-                "Teléfono": "72345678",
-                "Dirección": "Edificio Sur Torre B",
-                "Tipo de falla": "Sin señal",
-                "Descripción del problema": "Falla total desde ayer",
-            },
+            "title": "Falla splitter - Residencial Sur",
+            "description": "Splitter de distribución dañado",
+            "formData": fd("Elena Vargas","71100007","Residencial Sur Calle 8","Sin señal",
+                           "Diagnóstico indica splitter defectuoso",
+                           evidencia=file_reporte, reporte=file_diag),
             "autoTransitionIds": [T_INICIO_TO_RECEP, T_RECEP_TO_DIAG, f"{T_DIAG_TO_DEC}>>{T_DEC_ACEPTAR}"],
+            "_post": None,
         },
-        # Trámite 5: programación de visita
+        # ── EN_PROGRESO en Programación de Visita ────────────────────────────
         {
-            "workflowId": WF_INCIDENCIA,
-            "title": "Requiere visita técnica - Zona Norte",
-            "description": "Falla física, requiere intervención en campo",
-            "formData": {
-                "Nombre del cliente": "Pedro Chávez",
-                "Teléfono": "78901234",
-                "Dirección": "Zona Norte Av. 6 de Agosto",
-                "Tipo de falla": "Falla física",
-                "Descripción del problema": "Cable dañado visible desde la calle",
-            },
+            "title": "Cable dañado - Av. 6 de Agosto",
+            "description": "Daño físico en la línea exterior",
+            "formData": fd("Pedro Chávez","71100008","Av. 6 de Agosto #234","Falla física",
+                           "Cable roto visible en el poste",
+                           evidencia=file_reporte),
             "autoTransitionIds": [T_INICIO_TO_RECEP, T_RECEP_TO_DIAG, f"{T_DIAG_TO_DEC}>>{T_DEC_RECHAZAR}"],
+            "_post": None,
+        },
+        # ── COMPLETADO: llegaron al nodo Fin (con documentos completos) ───────
+        {
+            "title": "Internet restaurado - Edificio Norte",
+            "description": "Falla resuelta, servicio normalizado",
+            "formData": fd("Roberto Mamani","71100009","Edificio Norte Piso 2","Sin señal",
+                           "Resuelto: reemplazo de splitter",
+                           evidencia=file_reporte, reporte=file_diag),
+            "autoTransitionIds": [T_INICIO_TO_RECEP, T_RECEP_TO_DIAG,
+                                  f"{T_DIAG_TO_DEC}>>{T_DEC_ACEPTAR}", T_CIERRE_TO_FIN],
+            "_post": None,
+        },
+        {
+            "title": "Velocidad normalizada - Oficina Central",
+            "description": "Velocidad restaurada al 100%",
+            "formData": fd("Ana Quispe","71100010","Calle Loayza 456","Velocidad baja",
+                           "Resuelto: limpieza de conectores",
+                           evidencia=file_reporte, reporte=file_diag),
+            "autoTransitionIds": [T_INICIO_TO_RECEP, T_RECEP_TO_DIAG,
+                                  f"{T_DIAG_TO_DEC}>>{T_DEC_ACEPTAR}", T_CIERRE_TO_FIN],
+            "_post": None,
+        },
+        {
+            "title": "Visita técnica completada - Zona Norte",
+            "description": "Técnico realizó visita y resolvió el problema",
+            "formData": fd("Carlos Flores","71100011","Zona Norte Av. Arce","Falla física",
+                           "Cable exterior reemplazado",
+                           evidencia=file_reporte, reporte=file_diag),
+            "autoTransitionIds": [T_INICIO_TO_RECEP, T_RECEP_TO_DIAG,
+                                  f"{T_DIAG_TO_DEC}>>{T_DEC_RECHAZAR}", T_PROG_TO_FIN],
+            "_post": None,
+        },
+        # ── RECHAZADO: se submite y luego se llama /reject ───────────────────
+        {
+            "title": "Reporte falso - sin falla detectada",
+            "description": "El técnico verificó y no hay ninguna falla",
+            "formData": fd("Anónimo","71100012","Zona Central","Sin falla","El cliente reportó falla pero el equipo funciona bien"),
+            "autoTransitionIds": [T_INICIO_TO_RECEP, T_RECEP_TO_DIAG],
+            "_post": {"action": "reject", "reason": "Diagnóstico confirmó que no existe falla técnica. El equipo funciona correctamente."},
+        },
+        {
+            "title": "Solicitud duplicada - ya existe TRM anterior",
+            "description": "El cliente abrió dos tickets por la misma falla",
+            "formData": fd("Luis Mamani","71100013","Av. Camacho 123","Duplicado","Trámite duplicado, ya existe uno activo"),
+            "autoTransitionIds": [T_INICIO_TO_RECEP],
+            "_post": {"action": "reject", "reason": "Solicitud duplicada. Ya existe un trámite activo para este cliente y dirección."},
         },
     ]
 
     created = []
-    for t in tramites:
-        r = post(f"{BASE}/tramites/submit", token, t)
+    for t in specs:
+        body = {k: v for k, v in t.items() if not k.startswith("_")}
+        body["workflowId"] = WF_INCIDENCIA
+        r = post(f"{BASE}/tramites/submit", token, body)
         if r:
-            tid = r.get("id","?")
-            code = r.get("code","?")
-            status = r.get("status","?")
-            nodo = r.get("currentNodoName","?")
-            print(f"  OK: [{code}] '{t['title']}' → {status} / {nodo}")
+            tid  = r.get("id", "?")
+            code = r.get("code", "?")
+            stat = r.get("status", "?")
+
+            post_action = t.get("_post")
+            if post_action and tid != "?":
+                if post_action["action"] == "reject":
+                    rj = requests.post(
+                        f"{BASE}/activities/{tid}/reject",
+                        json={"reason": post_action["reason"]},
+                        headers=h(token)
+                    )
+                    stat = "RECHAZADO" if rj.ok else f"reject-err-{rj.status_code}"
+
+            print(f"  [{code}] {stat:<12} '{t['title']}'")
             created.append(r)
-        time.sleep(0.3)
+        time.sleep(0.2)
+
+    totales = {"PENDIENTE":0,"EN_PROGRESO":0,"COMPLETADO":0,"RECHAZADO":0}
+    for c in created:
+        s = c.get("status","?")
+        if s in totales: totales[s] += 1
+    print(f"  → PENDIENTE:{totales['PENDIENTE']} EN_PROGRESO:{totales['EN_PROGRESO']} "
+          f"COMPLETADO:{totales['COMPLETADO']} RECHAZADO:{totales['RECHAZADO']}")
     return created
 
 # ── 3. Crear nuevo workflow "Gestión de Contratos" ───────────────────────────
