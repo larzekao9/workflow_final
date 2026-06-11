@@ -134,6 +134,41 @@ html, body {
 /* ── Workflow editor: restore light Material theme ──────────────────── */
 app-workflow-editor {
   color: #0f172a;
+
+  /* mat-stroked-button */
+  .mat-mdc-outlined-button:not([disabled]) {
+    --mdc-outlined-button-label-text-color: #0f172a;
+    --mdc-outlined-button-outline-color: rgba(0,0,0,0.3);
+    color: #0f172a !important;
+    border-color: rgba(0,0,0,0.3) !important;
+  }
+  .mat-mdc-outlined-button:not([disabled]):hover {
+    --mdc-outlined-button-outline-color: rgba(0,0,0,0.6);
+    border-color: rgba(0,0,0,0.6) !important;
+  }
+
+  /* mat-button (text button) */
+  .mat-mdc-button:not([disabled]) {
+    --mdc-text-button-label-text-color: #0f172a;
+    color: #0f172a !important;
+  }
+  .mat-mdc-button[color="warn"]:not([disabled]) {
+    color: #dc2626 !important;
+  }
+
+  /* mat-flat-button primary */
+  .mat-mdc-unelevated-button[color="primary"]:not([disabled]) {
+    --mdc-filled-button-container-color: #4f46e5;
+    --mdc-filled-button-label-text-color: #ffffff;
+    background-color: #4f46e5 !important;
+    color: #ffffff !important;
+  }
+
+  /* mat-icon inside buttons */
+  .mat-mdc-outlined-button .mat-icon,
+  .mat-mdc-button .mat-icon {
+    color: inherit !important;
+  }
 }
 
 app-workflow-editor .mat-mdc-form-field,
