@@ -132,6 +132,10 @@ html, body {
 }
 
 /* ── Workflow editor: restore light Material theme ──────────────────── */
+app-workflow-editor {
+  color: #0f172a;
+}
+
 app-workflow-editor .mat-mdc-form-field,
 app-workflow-editor .mdc-text-field {
   --mdc-outlined-text-field-input-text-color: rgba(0,0,0,0.87) !important;
