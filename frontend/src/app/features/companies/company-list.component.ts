@@ -21,29 +21,50 @@ interface Company {
   imports: [CommonModule, FormsModule, MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule, MatInputModule, MatProgressSpinnerModule, MatSnackBarModule],
   template: `
     <div class="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-6 py-6">
+
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <h2 class="text-3xl font-bold text-slate-900">Empresas</h2>
-        <button mat-flat-button color="primary" (click)="openCreate()"><mat-icon>add</mat-icon> Nueva empresa</button>
+        <h2 class="text-2xl font-bold text-slate-100">Empresas</h2>
+        <button
+          class="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 cursor-pointer"
+          (click)="openCreate()">
+          <mat-icon class="!h-4 !w-4 !text-base">add</mat-icon>
+          Nueva empresa
+        </button>
       </div>
+
       @if (loading()) {
-        <div class="flex justify-center py-16"><mat-spinner /></div>
+        <div class="flex flex-col gap-2">
+          @for (_ of [1,2,3,4,5]; track $index) {
+            <div class="h-12 animate-pulse rounded-xl bg-[#111118]"></div>
+          }
+        </div>
       } @else {
-        <div class="overflow-hidden rounded-3xl bg-white shadow-sm">
+        <div class="overflow-hidden rounded-2xl border border-white/5 bg-[#111118]">
           <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
-              <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                <tr><th class="px-4 py-3">Nombre</th><th class="px-4 py-3">Acciones</th></tr>
+              <thead class="border-b border-white/5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th class="px-5 py-3.5">Nombre</th>
+                  <th class="px-5 py-3.5">Acciones</th>
+                </tr>
               </thead>
               <tbody>
                 @for (company of companies(); track company.id) {
-                  <tr class="border-t border-slate-100">
-                    <td class="px-4 py-3">{{ company.name }}</td>
-                    <td class="px-4 py-3">
-                      <button mat-icon-button (click)="openEdit(company)"><mat-icon>edit</mat-icon></button>
+                  <tr class="border-t border-white/5 transition hover:bg-white/[0.03]">
+                    <td class="px-5 py-3.5 text-slate-300">{{ company.name }}</td>
+                    <td class="px-5 py-3.5">
+                      <button
+                        class="cursor-pointer rounded-lg p-1.5 text-slate-500 transition hover:bg-white/8 hover:text-slate-200"
+                        (click)="openEdit(company)"
+                        aria-label="Editar empresa">
+                        <mat-icon class="!h-4 !w-4 !text-base">edit</mat-icon>
+                      </button>
                     </td>
                   </tr>
                 } @empty {
-                  <tr><td colspan="2" class="px-4 py-10 text-center text-slate-400">No hay empresas</td></tr>
+                  <tr>
+                    <td colspan="2" class="px-5 py-12 text-center text-slate-600">No hay empresas registradas</td>
+                  </tr>
                 }
               </tbody>
             </table>
@@ -52,17 +73,33 @@ interface Company {
       }
 
       @if (showForm()) {
-        <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/40 px-4" (click)="showForm.set(false)">
-          <mat-card class="w-full max-w-lg rounded-3xl p-6 shadow-2xl" (click)="$event.stopPropagation()">
-            <h3 class="mb-4 text-xl font-semibold text-slate-900">{{ editId() ? 'Editar' : 'Nueva' }} empresa</h3>
-            <mat-form-field appearance="outline" class="w-full"><mat-label>Nombre</mat-label><input matInput [(ngModel)]="form.name"></mat-form-field>
-            <div class="mt-4 flex justify-end gap-2">
-              <button mat-button (click)="showForm.set(false)">Cancelar</button>
-              <button mat-flat-button color="primary" (click)="save()">Guardar</button>
+        <div
+          class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+          (click)="showForm.set(false)">
+          <div
+            class="w-full max-w-lg rounded-2xl border border-white/8 bg-[#1a1a24] p-6 shadow-2xl"
+            (click)="$event.stopPropagation()">
+            <h3 class="mb-5 text-lg font-bold text-slate-100">{{ editId() ? 'Editar' : 'Nueva' }} empresa</h3>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Nombre</mat-label>
+              <input matInput [(ngModel)]="form.name">
+            </mat-form-field>
+            <div class="mt-5 flex justify-end gap-2">
+              <button
+                class="rounded-xl px-4 py-2 text-sm text-slate-400 transition hover:text-slate-200 cursor-pointer"
+                (click)="showForm.set(false)">
+                Cancelar
+              </button>
+              <button
+                class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 cursor-pointer"
+                (click)="save()">
+                Guardar
+              </button>
             </div>
-          </mat-card>
+          </div>
         </div>
       }
+
     </div>
   `
 })
