@@ -40,66 +40,91 @@ declare global {
   template: `
     <div class="mx-auto max-w-[1400px] p-6">
       <div class="mb-5">
-        <h2 class="m-0 text-2xl font-bold text-slate-800">Actividades</h2>
+        <h2 class="m-0 text-2xl font-bold text-slate-100">Actividades</h2>
         <p class="mt-1.5 text-[13px] text-slate-500">Las tareas que tienes pendientes por rol, cargo o departamento.</p>
       </div>
 
       @if (isLoading()) {
-        <div class="flex justify-center p-10"><mat-spinner /></div>
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
+          <div class="min-h-[560px] rounded-2xl border border-white/5 bg-[#111118] p-4 space-y-2.5">
+            @for (i of [1,2,3,4,5]; track i) {
+              <div class="h-[72px] w-full bg-white/[0.04] animate-pulse rounded-xl"></div>
+            }
+          </div>
+          <div class="min-h-[560px] rounded-2xl border border-white/5 bg-[#111118] p-4 space-y-3">
+            <div class="h-6 w-48 bg-white/[0.04] animate-pulse rounded-xl"></div>
+            <div class="h-4 w-64 bg-white/[0.04] animate-pulse rounded-xl"></div>
+            <div class="mt-4 h-24 w-full bg-white/[0.04] animate-pulse rounded-xl"></div>
+            <div class="h-24 w-full bg-white/[0.04] animate-pulse rounded-xl"></div>
+          </div>
+        </div>
       } @else {
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
-          <mat-card class="min-h-[560px] rounded-[14px] !p-4">
+
+          <!-- Panel izquierdo: lista de actividades -->
+          <div class="min-h-[560px] rounded-2xl border border-white/5 bg-[#111118] p-4">
             <div class="mb-3">
-              <h3 class="m-0 text-base font-bold text-slate-800">Pendientes</h3>
+              <h3 class="m-0 text-base font-bold text-slate-100">Pendientes</h3>
             </div>
 
             @for (activity of activities(); track activity.id) {
-              <button class="mb-2.5 w-full rounded-xl border border-slate-200 bg-white p-3 text-left"
-                [class.border-indigo-600]="selectedActivityId() === activity.id"
-                [class.bg-indigo-50]="selectedActivityId() === activity.id"
-                [class.shadow-[inset_0_0_0_1px_#4f46e5]]="selectedActivityId() === activity.id"
+              <button
+                class="mb-2.5 w-full rounded-xl border p-3 text-left cursor-pointer transition"
+                [ngClass]="selectedActivityId() === activity.id
+                  ? 'border-indigo-500/40 bg-indigo-500/10'
+                  : 'border-white/5 bg-white/[0.03] hover:bg-white/[0.06]'"
                 (click)="selectActivity(activity.id)">
-                <div class="mb-1.5 flex justify-between gap-2 text-xs text-slate-600">
-                  <strong>{{ activity.currentNodoName }}</strong>
+                <div class="mb-1.5 flex justify-between gap-2 text-xs text-slate-500">
+                  <strong class="text-slate-500">{{ activity.currentNodoName }}</strong>
                   <span>{{ activity.code }}</span>
                 </div>
-                <div class="mb-1 text-sm font-semibold text-slate-900">{{ activity.title }}</div>
+                <div class="mb-1 text-sm font-semibold text-slate-100">{{ activity.title }}</div>
                 <div class="text-xs text-slate-500">{{ activity.workflowName }}</div>
               </button>
             } @empty {
-              <div class="flex min-h-[220px] flex-col items-center justify-center gap-2.5 text-center text-slate-400">
-                <mat-icon class="!h-10 !w-10 !text-4xl">assignment_turned_in</mat-icon>
-                <p>No tienes actividades pendientes.</p>
+              <div class="flex min-h-[220px] flex-col items-center justify-center gap-2.5 text-center">
+                <mat-icon class="!h-10 !w-10 !text-4xl text-slate-700">assignment_turned_in</mat-icon>
+                <p class="text-slate-600">No tienes actividades pendientes.</p>
               </div>
             }
-          </mat-card>
+          </div>
 
-          <mat-card class="min-h-[560px] rounded-[14px] !p-4">
+          <!-- Panel derecho: detalle -->
+          <div class="min-h-[560px] rounded-2xl border border-white/5 bg-[#111118] p-4">
             @if (isDetailLoading()) {
-              <div class="flex justify-center p-10"><mat-spinner /></div>
+              <div class="space-y-3">
+                <div class="h-6 w-48 bg-white/[0.04] animate-pulse rounded-xl"></div>
+                <div class="h-4 w-64 bg-white/[0.04] animate-pulse rounded-xl"></div>
+                <div class="mt-4 h-24 w-full bg-white/[0.04] animate-pulse rounded-xl"></div>
+                <div class="h-24 w-full bg-white/[0.04] animate-pulse rounded-xl"></div>
+              </div>
             } @else if (selectedActivity()) {
               <div class="mb-[18px]">
-                <h3 class="m-0 text-[20px] font-semibold text-slate-900">{{ selectedActivity()!.currentNodoName }}</h3>
-                <p class="mt-1.5 text-[13px] text-slate-500">{{ selectedActivity()!.workflowName }} · {{ selectedActivity()!.code }}</p>
+                <div class="mb-2 flex items-center gap-2 flex-wrap">
+                  <span class="rounded bg-white/[0.08] font-mono text-slate-400 text-xs px-2 py-0.5">{{ selectedActivity()!.code }}</span>
+                  <span class="text-indigo-400 text-xs font-medium">{{ selectedActivity()!.currentNodoName }}</span>
+                </div>
+                <h3 class="m-0 text-[20px] font-semibold text-slate-100">{{ selectedActivity()!.currentNodoName }}</h3>
+                <p class="mt-1.5 text-[13px] text-slate-500">{{ selectedActivity()!.workflowName }}</p>
               </div>
 
               @if (selectedActivity()!.incomingData.length) {
                 <section class="mb-[18px]">
-                  <h4 class="mb-3 text-[15px] font-semibold text-slate-800">Datos compartidos</h4>
+                  <h4 class="mb-3 text-[15px] font-semibold text-slate-100">Datos compartidos</h4>
                   @for (block of selectedActivity()!.incomingData; track block.transitionId) {
-                    <div class="mb-2.5 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                      <div class="mb-2.5 flex justify-between gap-2 text-xs text-slate-600">
+                    <div class="mb-3 rounded-xl border border-white/5 bg-white/[0.03] p-4">
+                      <div class="mb-2.5 flex justify-between gap-2 text-xs text-slate-500">
                         <strong>{{ block.fromNodoName }}</strong>
                         <span>{{ block.transitionName || "Datos recibidos" }}</span>
                       </div>
                       @for (field of block.fields; track field.name) {
                         <div class="mb-2">
                           <label class="mb-1 block text-xs text-slate-500">{{ field.name }}</label>
-                          <div class="rounded-[10px] border border-slate-200 bg-white p-2.5 text-[13px] text-slate-900">
+                          <div class="rounded-[10px] border border-white/5 bg-white/[0.03] p-2.5 text-[13px] text-slate-300">
                             @if (field.type === 'GRID' && incomingGridColumns(field).length) {
                               <div class="overflow-x-auto">
                                 <table class="min-w-full text-xs">
-                                  <thead class="bg-slate-50 text-left uppercase tracking-wide text-slate-500">
+                                  <thead class="border-b border-white/5 text-left text-slate-500 uppercase tracking-wider">
                                     <tr>
                                       @for (column of incomingGridColumns(field); track column.id) {
                                         <th class="px-2 py-2">{{ column.name }}</th>
@@ -108,14 +133,14 @@ declare global {
                                   </thead>
                                   <tbody>
                                     @for (row of incomingGridRows(field); track rowIndex; let rowIndex = $index) {
-                                      <tr class="border-t border-slate-100">
+                                      <tr class="border-t border-white/5 hover:bg-white/[0.03]">
                                         @for (column of incomingGridColumns(field); track column.id) {
-                                          <td class="px-2 py-2">{{ row[column.name] ?? '' }}</td>
+                                          <td class="px-2 py-2 text-slate-300">{{ row[column.name] ?? '' }}</td>
                                         }
                                       </tr>
                                     } @empty {
                                       <tr>
-                                        <td class="px-2 py-3 text-center text-slate-400" [attr.colspan]="incomingGridColumns(field).length">Sin filas</td>
+                                        <td class="px-2 py-3 text-center text-slate-600" [attr.colspan]="incomingGridColumns(field).length">Sin filas</td>
                                       </tr>
                                     }
                                   </tbody>
@@ -123,15 +148,15 @@ declare global {
                               </div>
                             } @else if (isUploadedFile(field.value)) {
                               <div class="flex items-center gap-2">
-                                <mat-icon class="!h-4 !w-4 !text-base text-slate-400">description</mat-icon>
-                                <span class="flex-1 truncate text-sm text-slate-800">{{ uploadedFileName(field.value) }}</span>
+                                <mat-icon class="!h-4 !w-4 !text-base text-slate-500">description</mat-icon>
+                                <span class="flex-1 truncate text-sm text-slate-300">{{ uploadedFileName(field.value) }}</span>
                                 @if (documentAccess().canRead) {
-                                  <button type="button" class="flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-1 text-xs text-slate-600 hover:bg-slate-100" (click)="downloadFile(field.name, field.value)">
+                                  <button type="button" class="flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-xs text-slate-400 hover:bg-white/[0.06] transition" (click)="downloadFile(field.name, field.value)">
                                     <mat-icon class="!h-3.5 !w-3.5 !text-sm">download</mat-icon> Descargar
                                   </button>
                                 }
                                 @if (documentAccess().canEdit) {
-                                  <button type="button" class="flex items-center gap-1 rounded-lg bg-indigo-600 px-2 py-1 text-xs font-semibold text-white hover:bg-indigo-700" (click)="openInEditor(field.name, asStoredFile(field.value))">
+                                  <button type="button" class="flex items-center gap-1 rounded-lg bg-indigo-600 px-2 py-1 text-xs font-semibold text-white hover:bg-indigo-500 transition" (click)="openInEditor(field.name, asStoredFile(field.value))">
                                     <mat-icon class="!h-3.5 !w-3.5 !text-sm">edit</mat-icon> Editar
                                   </button>
                                 }
@@ -140,15 +165,15 @@ declare global {
                               <div class="flex flex-col gap-2">
                                 @for (file of toUploadedFiles(field.value); track file.storedName) {
                                   <div class="flex items-center gap-2">
-                                    <mat-icon class="!h-4 !w-4 !text-base text-slate-400">description</mat-icon>
-                                    <span class="flex-1 truncate text-sm text-slate-800">{{ uploadedFileName(file) }}</span>
+                                    <mat-icon class="!h-4 !w-4 !text-base text-slate-500">description</mat-icon>
+                                    <span class="flex-1 truncate text-sm text-slate-300">{{ uploadedFileName(file) }}</span>
                                     @if (documentAccess().canRead) {
-                                      <button type="button" class="flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-1 text-xs text-slate-600 hover:bg-slate-100" (click)="downloadFile(field.name, file)">
+                                      <button type="button" class="flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-xs text-slate-400 hover:bg-white/[0.06] transition" (click)="downloadFile(field.name, file)">
                                         <mat-icon class="!h-3.5 !w-3.5 !text-sm">download</mat-icon> Descargar
                                       </button>
                                     }
                                     @if (documentAccess().canEdit) {
-                                      <button type="button" class="flex items-center gap-1 rounded-lg bg-indigo-600 px-2 py-1 text-xs font-semibold text-white hover:bg-indigo-700" (click)="openInEditor(field.name, asStoredFile(file))">
+                                      <button type="button" class="flex items-center gap-1 rounded-lg bg-indigo-600 px-2 py-1 text-xs font-semibold text-white hover:bg-indigo-500 transition" (click)="openInEditor(field.name, asStoredFile(file))">
                                         <mat-icon class="!h-3.5 !w-3.5 !text-sm">edit</mat-icon> Editar
                                       </button>
                                     }
@@ -170,25 +195,25 @@ declare global {
 
               @if (tramiteFiles().length) {
                 <section class="mb-[18px]">
-                  <h4 class="mb-3 text-[15px] font-semibold text-slate-800">Archivos del trámite</h4>
+                  <h4 class="mb-3 text-[15px] font-semibold text-slate-100">Archivos del trámite</h4>
                   <div class="flex flex-col gap-2">
                     @for (file of tramiteFiles(); track file.name) {
-                      <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                        <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ file.name }}</p>
+                      <div class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
+                        <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">{{ file.name }}</p>
                         @for (f of tramiteFileItems(file.value); track f.storedName) {
-                          <div class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2">
-                            <mat-icon class="!h-4 !w-4 !text-base text-slate-400">description</mat-icon>
-                            <span class="flex-1 truncate text-sm text-slate-800">{{ f.fileName || f.storedName }}</span>
-                            <button type="button" class="flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-1 text-xs text-slate-600 hover:bg-slate-100" (click)="downloadFile(file.name, f)">
+                          <div class="flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-2">
+                            <mat-icon class="!h-4 !w-4 !text-base text-slate-500">description</mat-icon>
+                            <span class="flex-1 truncate text-sm text-slate-300">{{ f.fileName || f.storedName }}</span>
+                            <button type="button" class="flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-xs text-slate-400 hover:bg-white/[0.06] transition" (click)="downloadFile(file.name, f)">
                               <mat-icon class="!h-3.5 !w-3.5 !text-sm">download</mat-icon> Descargar
                             </button>
-                            <button type="button" class="flex items-center gap-1 rounded-lg bg-indigo-600 px-2 py-1 text-xs font-semibold text-white hover:bg-indigo-700" (click)="openInEditor(file.name, f)">
+                            <button type="button" class="flex items-center gap-1 rounded-lg bg-indigo-600 px-2 py-1 text-xs font-semibold text-white hover:bg-indigo-500 transition" (click)="openInEditor(file.name, f)">
                               <mat-icon class="!h-3.5 !w-3.5 !text-sm">edit</mat-icon> Editar colaborativamente
                             </button>
                           </div>
                         }
                         @if (documentAccess().canEdit) {
-                          <label class="mt-2 flex cursor-pointer items-center gap-1 text-xs text-indigo-500 hover:text-indigo-700">
+                          <label class="mt-2 flex cursor-pointer items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition">
                             <mat-icon class="!h-3.5 !w-3.5 !text-sm">upload</mat-icon> Reemplazar archivo
                             <input type="file" class="hidden" (change)="replaceFile(file.name, $event)" />
                           </label>
@@ -202,23 +227,28 @@ declare global {
               @if (formFields().length) {
                 <section class="mb-[18px]">
                   <div class="mb-3 flex items-center justify-between gap-3">
-                    <h4 class="text-[15px] font-semibold text-slate-800">{{ formTitle() }}</h4>
-                    <button mat-stroked-button type="button" [disabled]="voiceLoading() || !canAdvance()" (click)="toggleVoiceCapture()">
-                      <mat-icon>{{ voiceListening() ? 'mic_off' : 'mic' }}</mat-icon>
+                    <h4 class="text-[15px] font-semibold text-slate-100">{{ formTitle() }}</h4>
+                    <button
+                      type="button"
+                      class="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white transition disabled:opacity-40"
+                      [ngClass]="voiceListening() ? 'bg-rose-500 hover:bg-rose-400' : 'bg-indigo-600 hover:bg-indigo-500'"
+                      [disabled]="voiceLoading() || !canAdvance()"
+                      (click)="toggleVoiceCapture()">
+                      <mat-icon class="!text-[16px]">{{ voiceListening() ? 'mic_off' : 'mic' }}</mat-icon>
                       {{ voiceListening() ? 'Detener voz' : 'Llenar por voz' }}
                     </button>
                   </div>
                   @for (field of formFields(); track field.id) {
                     @if (field.type === "FILE") {
                       <div class="mb-4 flex flex-col gap-2">
-                        <label class="text-[13px] font-medium text-slate-700">{{ field.name }}</label>
+                        <label class="text-[13px] font-medium text-slate-300">{{ field.name }}</label>
                         @if (canUploadForField(field)) {
-                          <input class="text-[13px] text-slate-700" type="file" multiple (change)="uploadFiles(field, $event)" />
+                          <input class="text-[13px] text-slate-300" type="file" multiple (change)="uploadFiles(field, $event)" />
                         }
                         @if (fileItemsForField(field).length) {
-                          <div class="flex flex-col gap-1 text-xs text-indigo-500">
+                          <div class="flex flex-col gap-1 text-xs text-indigo-400">
                             @for (file of fileItemsForField(field); track file.storedName) {
-                              <button type="button" class="cursor-pointer border-none bg-transparent p-0 text-left font-inherit text-indigo-600 underline" (click)="downloadFile(field.name, file)">{{ uploadedFileName(file) }}</button>
+                              <button type="button" class="cursor-pointer border-none bg-transparent p-0 text-left font-inherit text-indigo-400 underline hover:text-indigo-300 transition" (click)="downloadFile(field.name, file)">{{ uploadedFileName(file) }}</button>
                             }
                           </div>
                         }
@@ -226,13 +256,13 @@ declare global {
                     } @else if (field.type === "GRID") {
                       <div class="mb-4">
                         <div class="mb-2 flex items-center justify-between gap-3">
-                          <label class="text-[13px] font-medium text-slate-700">{{ field.name }}</label>
+                          <label class="text-[13px] font-medium text-slate-300">{{ field.name }}</label>
                           <button mat-stroked-button type="button" (click)="addGridRow(field)">Agregar fila</button>
                         </div>
                         @if (gridColumns(field).length) {
-                          <div class="overflow-x-auto rounded-xl border border-slate-200">
+                          <div class="overflow-x-auto rounded-xl border border-white/5">
                             <table class="min-w-full text-sm">
-                              <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                              <thead class="border-b border-white/5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                                 <tr>
                                   @for (column of gridColumns(field); track column.id) {
                                     <th class="px-3 py-2">{{ column.name }}</th>
@@ -242,14 +272,14 @@ declare global {
                               </thead>
                               <tbody>
                                 @for (row of gridRows(field); track rowIndex; let rowIndex = $index) {
-                                  <tr class="border-t border-slate-100">
+                                  <tr class="border-t border-white/5 hover:bg-white/[0.03]">
                                     @for (column of gridColumns(field); track column.id) {
                                       <td class="px-3 py-2">
                                         @if (column.type === 'CHECKBOX') {
                                           <mat-checkbox [ngModel]="toBoolean(row[column.name])" (ngModelChange)="setGridCellValue(field, rowIndex, column, $event)"></mat-checkbox>
                                         } @else {
                                           <input
-                                            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-indigo-400"
+                                            class="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 outline-none focus:border-indigo-500 focus:bg-white/[0.06]"
                                             [type]="inputType(column.type)"
                                             [ngModel]="row[column.name] ?? ''"
                                             (ngModelChange)="setGridCellValue(field, rowIndex, column, $event)" />
@@ -257,27 +287,27 @@ declare global {
                                       </td>
                                     }
                                     <td class="px-3 py-2 text-right">
-                                        <button mat-button color="warn" type="button" (click)="removeGridRow(field, rowIndex)">Quitar</button>
+                                      <button mat-button color="warn" type="button" (click)="removeGridRow(field, rowIndex)">Quitar</button>
                                     </td>
                                   </tr>
                                 } @empty {
                                   <tr>
-                                    <td class="px-3 py-4 text-center text-sm text-slate-400" [attr.colspan]="gridColumns(field).length + 1">Sin filas</td>
+                                    <td class="px-3 py-4 text-center text-sm text-slate-600" [attr.colspan]="gridColumns(field).length + 1">Sin filas</td>
                                   </tr>
                                 }
                               </tbody>
                             </table>
                           </div>
                         } @else {
-                          <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+                          <div class="rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-3 text-sm text-slate-500">
                             Esta grilla no tiene columnas configuradas.
                           </div>
                         }
                       </div>
                     } @else if (field.type === "CHECKBOX") {
-                      <div class="mb-4 rounded-xl border border-slate-200 px-3 py-2">
+                      <div class="mb-4 rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2">
                         <mat-checkbox [ngModel]="toBoolean(fieldValue(field))" (ngModelChange)="setFieldValue(field, $event)">
-                          {{ field.name }}
+                          <span class="text-slate-300">{{ field.name }}</span>
                         </mat-checkbox>
                       </div>
                     } @else {
@@ -293,23 +323,35 @@ declare global {
               @if (visibleTransitions().length) {
                 <div class="mt-2 flex flex-wrap justify-end gap-3">
                   @for (transition of visibleTransitions(); track transition.id) {
-                    <button mat-flat-button
-                      [color]="transition.resultadoRama === 'rechazo' ? 'warn' : 'primary'"
-                      [disabled]="isSubmitting()"
-                      (click)="advance(transition.id)">
-                      <mat-icon>{{ transition.resultadoRama === "rechazo" ? "cancel" : "arrow_forward" }}</mat-icon>
-                      {{ isSubmitting() ? "Enviando..." : (transition.label || transition.name || "Continuar") }}
-                    </button>
+                    @if (transition.resultadoRama === 'rechazo') {
+                      <button
+                        type="button"
+                        class="flex items-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-sm font-semibold text-rose-400 hover:bg-rose-500/20 transition disabled:opacity-40"
+                        [disabled]="isSubmitting()"
+                        (click)="advance(transition.id)">
+                        <mat-icon class="!text-[16px]">cancel</mat-icon>
+                        {{ isSubmitting() ? "Enviando..." : (transition.label || transition.name || "Rechazar") }}
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition disabled:opacity-40"
+                        [disabled]="isSubmitting()"
+                        (click)="advance(transition.id)">
+                        <mat-icon class="!text-[16px]">arrow_forward</mat-icon>
+                        {{ isSubmitting() ? "Enviando..." : (transition.label || transition.name || "Continuar") }}
+                      </button>
+                    }
                   }
                 </div>
               }
             } @else {
-              <div class="flex min-h-full flex-col items-center justify-center gap-2.5 text-center text-slate-400">
-                <mat-icon class="!h-10 !w-10 !text-4xl">assignment</mat-icon>
-                <p>Selecciona una actividad para verla.</p>
+              <div class="flex min-h-full flex-col items-center justify-center gap-2.5 text-center">
+                <mat-icon class="!h-10 !w-10 !text-4xl text-slate-700">assignment</mat-icon>
+                <p class="text-slate-600">Selecciona una actividad para verla.</p>
               </div>
             }
-          </mat-card>
+          </div>
         </div>
       }
     </div>

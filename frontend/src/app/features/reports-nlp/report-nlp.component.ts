@@ -46,16 +46,15 @@ interface ReportResult {
 
       <!-- Header -->
       <div>
-        <h2 class="m-0 text-2xl font-bold text-slate-800">Reportes</h2>
-      
+        <h2 class="m-0 text-2xl font-bold text-slate-100">Reportes</h2>
       </div>
 
       <!-- Input card -->
-      <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="rounded-2xl border border-white/5 bg-[#111118] p-5">
         <div class="mb-4 flex gap-3">
           <!-- Mic -->
           <button
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow transition"
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition"
             [class.mic-pulse]="recording()"
             [class.bg-rose-500]="recording()"
             [class.bg-indigo-600]="!recording()"
@@ -66,7 +65,7 @@ interface ReportResult {
 
           <!-- Textarea -->
           <textarea
-            class="flex-1 resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none"
+            class="flex-1 resize-none rounded-xl border border-white/10 bg-white/[0.04] p-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-indigo-500 focus:bg-white/[0.06] focus:outline-none"
             rows="3"
             placeholder='Ej: "reporte del departamento técnico entre enero y marzo en excel, agrupado por workflow" o "todos los trámites pendientes de este mes en pantalla ordenado por fecha"'
             [(ngModel)]="prompt">
@@ -74,7 +73,7 @@ interface ReportResult {
         </div>
 
         @if (recording()) {
-          <p class="mb-3 flex items-center gap-1.5 text-xs text-rose-500">
+          <p class="mb-3 flex items-center gap-1.5 text-xs text-rose-400">
             <span class="h-2 w-2 animate-pulse rounded-full bg-rose-500"></span>
             Grabando… hablá ahora
           </p>
@@ -82,7 +81,7 @@ interface ReportResult {
 
         <div class="flex flex-wrap items-center gap-3">
           <button
-            class="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-50"
+            class="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-40"
             [disabled]="!prompt.trim() || loading()"
             (click)="generate()">
             @if (loading()) {
@@ -95,7 +94,7 @@ interface ReportResult {
 
           @if (result()) {
             <button
-              class="flex items-center gap-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-500 transition hover:bg-slate-50"
+              class="flex items-center gap-1 rounded-xl px-4 py-2.5 text-sm text-slate-400 transition hover:text-slate-200"
               (click)="clear()">
               <mat-icon class="!text-[18px]">refresh</mat-icon>
               Nuevo
@@ -104,7 +103,7 @@ interface ReportResult {
         </div>
 
         @if (error()) {
-          <div class="mt-4 flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <div class="mt-4 flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-400">
             <mat-icon class="!text-[18px]">error_outline</mat-icon>
             {{ error() }}
           </div>
@@ -115,16 +114,16 @@ interface ReportResult {
       @if (result()) {
         <!-- Spec summary -->
         <div class="flex flex-wrap gap-2">
-          <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
+          <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-400">
             {{ result()!.total }} resultado(s)
           </span>
           @for (entry of activeFilters(); track entry.key) {
-            <span class="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
+            <span class="rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs font-medium text-indigo-300">
               {{ entry.key }}: {{ entry.value }}
             </span>
           }
           @if (result()!.spec.groupBy) {
-            <span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+            <span class="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-400">
               Agrupado por {{ colLabel(result()!.spec.groupBy!) }}
             </span>
           }
@@ -132,32 +131,32 @@ interface ReportResult {
 
         <!-- Tabla -->
         @if (result()!.data.length) {
-          <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div class="flex items-center border-b border-slate-100 bg-slate-50 px-5 py-3">
-              <span class="font-semibold text-slate-700">{{ result()!.spec.title }}</span>
+          <div class="overflow-hidden rounded-2xl border border-white/5 bg-[#111118]">
+            <div class="flex items-center border-b border-white/5 px-5 py-3">
+              <span class="font-semibold text-slate-100">{{ result()!.spec.title }}</span>
             </div>
             <div class="overflow-x-auto">
               <table class="min-w-full text-sm">
-                <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <thead class="border-b border-white/5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                   <tr>
                     @for (col of result()!.spec.columns; track col) {
-                      <th class="border-b border-slate-200 px-4 py-3">{{ colLabel(col) }}</th>
+                      <th class="px-4 py-3">{{ colLabel(col) }}</th>
                     }
                   </tr>
                 </thead>
                 <tbody>
                   @for (row of result()!.data; track $index) {
                     @if (isGroupHeader(row)) {
-                      <tr class="bg-indigo-50">
+                      <tr class="bg-indigo-500/10">
                         <td [attr.colspan]="result()!.spec.columns.length"
-                            class="px-4 py-2 text-xs font-bold text-indigo-700">
+                            class="px-4 py-2 text-xs font-bold text-indigo-300">
                           {{ row['_groupLabel'] }}
                         </td>
                       </tr>
                     } @else {
-                      <tr class="border-t border-slate-100 hover:bg-slate-50">
+                      <tr class="border-t border-white/5 hover:bg-white/[0.03]">
                         @for (col of result()!.spec.columns; track col) {
-                          <td class="px-4 py-2.5 text-slate-700">{{ formatCell(row, col) }}</td>
+                          <td class="px-4 py-2.5 text-slate-300">{{ formatCell(row, col) }}</td>
                         }
                       </tr>
                     }
@@ -165,14 +164,14 @@ interface ReportResult {
                 </tbody>
               </table>
             </div>
-            <div class="border-t border-slate-100 px-5 py-2 text-right text-xs text-slate-400">
+            <div class="border-t border-white/5 px-5 py-2 text-right text-xs text-slate-500">
               {{ result()!.total }} registro(s)
             </div>
           </div>
         } @else {
-          <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-slate-400">
-            <mat-icon class="!h-10 !w-10 !text-4xl">search_off</mat-icon>
-            <p class="mt-2">No se encontraron datos para los criterios indicados.</p>
+          <div class="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-8 text-center">
+            <mat-icon class="!h-10 !w-10 !text-4xl text-slate-600">search_off</mat-icon>
+            <p class="mt-2 text-slate-600">No se encontraron datos para los criterios indicados.</p>
           </div>
         }
       }

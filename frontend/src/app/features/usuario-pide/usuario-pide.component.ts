@@ -42,14 +42,14 @@ interface WorkflowMatch {
       50%      { box-shadow: 0 0 0 14px rgba(239,68,68,0); }
     }
     .drop-zone { transition: all .2s; }
-    .drop-zone.drag-over { border-color: #6366f1; background: #eef2ff; }
+    .drop-zone.drag-over { border-color: #6366f1; background: rgba(99,102,241,.08); }
   `],
   template: `
     <div class="mx-auto max-w-[1300px] p-6 space-y-6">
 
       <!-- Header -->
       <div>
-        <h2 class="m-0 text-2xl font-bold text-slate-800">Usuario Pide</h2>
+        <h2 class="m-0 text-2xl font-bold text-slate-100">Usuario Pide</h2>
         <p class="mt-1 text-sm text-slate-500">
           Describí tu problema y subí tus documentos. TensorFlow analizará el contenido,
           recomendará los 3 workflows más adecuados e indicará qué campos obligatorios faltan completar.
@@ -62,14 +62,14 @@ interface WorkflowMatch {
         <div class="space-y-4">
 
           <!-- Descripción voz/texto -->
-          <div class="rounded-[18px] border border-slate-200 bg-white p-5 shadow-sm">
-            <h3 class="mb-3 text-sm font-semibold text-slate-700">
-              <mat-icon class="mr-1 !text-[16px] align-middle text-indigo-500">mic</mat-icon>
+          <div class="rounded-[18px] border border-white/5 bg-[#111118] p-5">
+            <h3 class="mb-3 text-sm font-semibold text-slate-300">
+              <mat-icon class="mr-1 !text-[16px] align-middle text-indigo-400">mic</mat-icon>
               Describí tu problema
             </h3>
             <div class="flex gap-3">
               <button
-                class="mic-btn flex h-11 w-11 shrink-0 items-center justify-center rounded-full shadow transition"
+                class="mic-btn flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition"
                 [class.recording]="recording()"
                 [class.bg-rose-500]="recording()"
                 [class.bg-indigo-600]="!recording()"
@@ -77,14 +77,14 @@ interface WorkflowMatch {
                 <mat-icon class="!text-[20px] text-white">{{ recording() ? 'stop' : 'mic' }}</mat-icon>
               </button>
               <textarea
-                class="flex-1 resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none"
+                class="flex-1 resize-none rounded-xl border border-white/10 bg-white/[0.04] p-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-indigo-500 focus:bg-white/[0.06] focus:outline-none"
                 rows="4"
                 [(ngModel)]="userText"
                 placeholder='Ej: "Necesito reconectar el servicio de agua, tengo la factura y mi DNI"'>
               </textarea>
             </div>
             @if (recording()) {
-              <p class="mt-2 flex items-center gap-1.5 text-xs text-rose-500">
+              <p class="mt-2 flex items-center gap-1.5 text-xs text-rose-400">
                 <span class="h-2 w-2 animate-pulse rounded-full bg-rose-500"></span>
                 Grabando… hablá ahora
               </p>
@@ -92,28 +92,28 @@ interface WorkflowMatch {
           </div>
 
           <!-- Subir documentos -->
-          <div class="rounded-[18px] border border-slate-200 bg-white p-5 shadow-sm">
-            <h3 class="mb-3 text-sm font-semibold text-slate-700">
-              <mat-icon class="mr-1 !text-[16px] align-middle text-emerald-500">upload_file</mat-icon>
+          <div class="rounded-[18px] border border-white/5 bg-[#111118] p-5">
+            <h3 class="mb-3 text-sm font-semibold text-slate-300">
+              <mat-icon class="mr-1 !text-[16px] align-middle text-emerald-400">upload_file</mat-icon>
               Subí tus documentos
             </h3>
-            <p class="mb-3 text-xs text-slate-400">
-              Formatos aceptados: <strong>Word (.docx), PDF, TXT</strong>.
+            <p class="mb-3 text-xs text-slate-500">
+              Formatos aceptados: <strong class="text-slate-400">Word (.docx), PDF, TXT</strong>.
               TensorFlow leerá el contenido y determinará qué tipo de documento es cada uno.
             </p>
 
             <!-- Drop zone -->
             <div
-              class="drop-zone flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition hover:border-indigo-400 hover:bg-indigo-50"
+              class="drop-zone flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-white/[0.03] px-4 py-8 text-center transition hover:border-indigo-500 hover:bg-indigo-500/10"
               (click)="fileInput.click()"
               (dragover)="onDragOver($event)"
               (dragleave)="onDragLeave($event)"
               (drop)="onDrop($event)">
-              <mat-icon class="mb-2 !text-4xl text-slate-300">cloud_upload</mat-icon>
+              <mat-icon class="mb-2 !text-4xl text-slate-600">cloud_upload</mat-icon>
               <p class="text-sm font-medium text-slate-500">
                 Arrastrá archivos aquí o hacé clic para seleccionar
               </p>
-              <p class="mt-1 text-xs text-slate-400">.docx · .pdf · .txt</p>
+              <p class="mt-1 text-xs text-slate-600">.docx · .pdf · .txt</p>
             </div>
             <input #fileInput type="file" class="hidden"
                    accept=".docx,.pdf,.txt" multiple
@@ -122,18 +122,18 @@ interface WorkflowMatch {
             @if (selectedFiles.length) {
               <div class="mt-3 space-y-2">
                 @for (f of selectedFiles; track f.name; let i = $index) {
-                  <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2">
+                  <div class="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.04] px-3 py-2">
                     <div class="flex items-center gap-2 min-w-0">
                       <mat-icon class="shrink-0 !text-[20px] text-indigo-400">
                         {{ fileIcon() }}
                       </mat-icon>
                       <div class="min-w-0">
-                        <p class="truncate text-xs font-medium text-slate-700">{{ f.name }}</p>
-                        <p class="text-xs text-slate-400">{{ (f.size / 1024).toFixed(0) }} KB</p>
+                        <p class="truncate text-xs font-medium text-slate-300">{{ f.name }}</p>
+                        <p class="text-xs text-slate-500">{{ (f.size / 1024).toFixed(0) }} KB</p>
                       </div>
                     </div>
                     <button (click)="removeFile(i)"
-                      class="ml-2 shrink-0 rounded-full p-1 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition">
+                      class="ml-2 shrink-0 rounded-full p-1 text-slate-500 hover:bg-rose-500/15 hover:text-rose-400 transition">
                       <mat-icon class="!text-[16px]">close</mat-icon>
                     </button>
                   </div>
@@ -144,7 +144,7 @@ interface WorkflowMatch {
 
           <!-- Botón analizar -->
           <button
-            class="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 transition"
+            class="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-40 transition"
             [disabled]="loading() || (!userText.trim() && !selectedFiles.length)"
             (click)="analyze()">
             @if (loading()) {
@@ -157,7 +157,7 @@ interface WorkflowMatch {
           </button>
 
           @if (error()) {
-            <div class="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            <div class="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-400">
               <mat-icon class="!text-[18px] shrink-0">error_outline</mat-icon>
               {{ error() }}
             </div>
@@ -169,29 +169,29 @@ interface WorkflowMatch {
 
           <!-- Documentos analizados por TF -->
           @if (analyzedDocs().length) {
-            <div class="rounded-[18px] border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 class="mb-3 text-sm font-semibold text-slate-700">
+            <div class="rounded-[18px] border border-white/5 bg-[#111118] p-5">
+              <h3 class="mb-3 text-sm font-semibold text-slate-300">
                 <mat-icon class="mr-1 !text-[16px] align-middle text-indigo-400">auto_awesome</mat-icon>
                 Documentos leídos por TensorFlow
               </h3>
               <div class="space-y-2">
                 @for (doc of analyzedDocs(); track doc.filename) {
-                  <div class="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3">
-                    <mat-icon class="shrink-0 !text-[22px] text-indigo-500 mt-0.5">
+                  <div class="flex items-start gap-3 rounded-xl bg-white/[0.04] p-3">
+                    <mat-icon class="shrink-0 !text-[22px] text-indigo-400 mt-0.5">
                       {{ docTypeIcon() }}
                     </mat-icon>
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center justify-between gap-2">
-                        <p class="truncate text-xs font-semibold text-slate-700">{{ doc.filename }}</p>
-                        <span class="shrink-0 rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-700">
+                        <p class="truncate text-xs font-semibold text-slate-300">{{ doc.filename }}</p>
+                        <span class="shrink-0 rounded-full bg-indigo-500/15 px-2 py-0.5 text-xs font-semibold text-indigo-300">
                           {{ doc.confidence }}%
                         </span>
                       </div>
-                      <p class="mt-0.5 text-xs font-medium text-indigo-600">
+                      <p class="mt-0.5 text-xs font-medium text-indigo-400">
                         {{ docTypeLabel(doc.detectedType) }}
                       </p>
                       @if (doc.preview) {
-                        <p class="mt-1 line-clamp-2 text-xs text-slate-400">{{ doc.preview }}</p>
+                        <p class="mt-1 line-clamp-2 text-xs text-slate-500">{{ doc.preview }}</p>
                       }
                     </div>
                   </div>
@@ -202,15 +202,15 @@ interface WorkflowMatch {
 
           <!-- Estado vacío -->
           @if (!matches().length && !loading() && !analyzedDocs().length) {
-            <div class="flex flex-col items-center justify-center rounded-[18px] border border-dashed border-slate-200 bg-slate-50 p-10 text-center text-slate-400">
-              <mat-icon class="mb-3 !text-5xl text-slate-300">account_tree</mat-icon>
-              <p class="font-medium">Los workflows recomendados aparecerán aquí</p>
-              <p class="mt-1 text-xs">Describí tu problema, subí tus documentos y hacé clic en "Analizar"</p>
+            <div class="flex flex-col items-center justify-center rounded-[18px] border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
+              <mat-icon class="mb-3 !text-5xl text-slate-700">account_tree</mat-icon>
+              <p class="font-medium text-slate-600">Los workflows recomendados aparecerán aquí</p>
+              <p class="mt-1 text-xs text-slate-600">Describí tu problema, subí tus documentos y hacé clic en "Analizar"</p>
             </div>
           }
 
           @if (loading()) {
-            <div class="flex flex-col items-center justify-center rounded-[18px] border border-slate-200 bg-white p-10">
+            <div class="flex flex-col items-center justify-center rounded-[18px] border border-white/5 bg-[#111118] p-10">
               <mat-spinner [diameter]="40" />
               <p class="mt-4 text-sm text-slate-500">Leyendo documentos y analizando con TensorFlow…</p>
             </div>
@@ -219,30 +219,27 @@ interface WorkflowMatch {
           <!-- Workflows recomendados -->
           @if (matches().length && !loading()) {
             <div class="space-y-3">
-              <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Workflows recomendados
               </p>
 
               @for (m of matches(); track m.workflowId; let i = $index) {
-                <div class="rounded-[18px] border bg-white p-5 shadow-sm"
-                     [class.border-indigo-300]="i === 0"
-                     [class.ring-1]="i === 0"
-                     [class.ring-indigo-200]="i === 0"
-                     [class.border-slate-200]="i !== 0">
+                <div class="rounded-2xl border p-5"
+                     [ngClass]="i === 0 ? 'border-indigo-500/30 bg-indigo-500/10' : 'border-white/5 bg-white/[0.04]'"
+                     >
 
                   <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-2">
                       <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                            [class.bg-indigo-600]="i === 0"
-                            [class.bg-slate-300]="i !== 0">
+                            [ngClass]="i === 0 ? 'bg-indigo-600' : 'bg-white/20'">
                         {{ i + 1 }}
                       </span>
                       <div>
-                        <p class="font-semibold text-slate-800">{{ m.workflowName }}</p>
+                        <p class="font-semibold text-slate-100">{{ m.workflowName }}</p>
                         @if (m.workflowDescription) {
                           <p class="mt-0.5 text-xs text-slate-500">{{ m.workflowDescription }}</p>
                         }
-                        <p class="mt-0.5 text-xs text-slate-400">Similitud: {{ m.cosSim }}%</p>
+                        <p class="mt-0.5 text-xs text-slate-500">Similitud: {{ m.cosSim }}%</p>
                       </div>
                     </div>
                     <div class="shrink-0 text-right">
@@ -255,7 +252,7 @@ interface WorkflowMatch {
                   </div>
 
                   <!-- Barra de progreso -->
-                  <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
                     <div class="h-2 rounded-full transition-all"
                          [style.width.%]="m.score"
                          [ngClass]="scoreBarColor(m.score)">
@@ -272,8 +269,8 @@ interface WorkflowMatch {
                         @for (doc of m.requiredDocs; track doc) {
                           <span class="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium border"
                                 [ngClass]="m.presentRequired.includes(doc)
-                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                  : 'bg-rose-50 text-rose-700 border-rose-200'">
+                                  ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                                  : 'bg-rose-500/15 text-rose-400 border-rose-500/30'">
                             <mat-icon class="!h-3.5 !w-3.5 !text-[13px]">
                               {{ m.presentRequired.includes(doc) ? 'check_circle' : 'cancel' }}
                             </mat-icon>
@@ -287,13 +284,13 @@ interface WorkflowMatch {
                   <!-- Campos opcionales -->
                   @if (m.optionalDocs.length) {
                     <div class="mt-2">
-                      <p class="mb-2 text-xs font-semibold text-slate-400">Campos opcionales:</p>
+                      <p class="mb-2 text-xs font-semibold text-slate-500">Campos opcionales:</p>
                       <div class="flex flex-wrap gap-1.5">
                         @for (doc of m.optionalDocs; track doc) {
                           <span class="flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs"
                                 [ngClass]="m.presentOptional.includes(doc)
-                                  ? 'border-emerald-200 bg-emerald-50 text-emerald-600'
-                                  : 'border-slate-200 bg-slate-50 text-slate-400'">
+                                  ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
+                                  : 'border-white/10 bg-white/5 text-slate-500'">
                             <mat-icon class="!h-3.5 !w-3.5 !text-[13px]">description</mat-icon>
                             {{ doc }}
                           </span>
@@ -304,8 +301,8 @@ interface WorkflowMatch {
 
                   <!-- Alerta campos faltantes -->
                   @if (m.missingRequired.length) {
-                    <div class="mt-3 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800">
-                      <mat-icon class="!text-[18px] shrink-0 mt-0.5 text-amber-500">warning</mat-icon>
+                    <div class="mt-3 flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-xs text-amber-400">
+                      <mat-icon class="!text-[18px] shrink-0 mt-0.5">warning</mat-icon>
                       <div>
                         <p class="font-semibold">Faltan estos campos obligatorios:</p>
                         <ul class="mt-1 list-disc pl-4 space-y-0.5">
@@ -313,7 +310,7 @@ interface WorkflowMatch {
                             <li><strong>{{ campo }}</strong></li>
                           }
                         </ul>
-                        <p class="mt-1 text-amber-700">
+                        <p class="mt-1 opacity-80">
                           Tenés que completarlos o presentarlos para poder avanzar en el trámite.
                         </p>
                       </div>
@@ -321,7 +318,7 @@ interface WorkflowMatch {
                   }
 
                   @if (m.docsComplete) {
-                    <div class="mt-3 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
+                    <div class="mt-3 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-400">
                       <mat-icon class="!text-[16px]">verified</mat-icon>
                       Tenés todos los campos obligatorios cubiertos. ¡Podés iniciar el trámite!
                     </div>
@@ -329,13 +326,13 @@ interface WorkflowMatch {
 
                   @if (i === 0) {
                     <button (click)="iniciarTramite(m)"
-                      class="mt-4 w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition">
+                      class="mt-4 w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition">
                       <mat-icon class="!text-[18px]">play_arrow</mat-icon>
                       Iniciar trámite con este workflow
                     </button>
                   } @else {
                     <button (click)="iniciarTramite(m)"
-                      class="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-2 text-sm text-slate-600 hover:bg-slate-50 transition">
+                      class="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-white/10 py-2 text-sm text-slate-400 hover:bg-white/[0.03] transition">
                       Usar este workflow
                     </button>
                   }
@@ -468,12 +465,12 @@ export class UsuarioPideComponent implements OnDestroy {
 
   docTypeIcon() { return 'insert_drive_file'; }
 
-  scoreColor(s: number)    { return s >= 70 ? 'text-emerald-600' : s >= 40 ? 'text-amber-500' : 'text-slate-400'; }
-  scoreBarColor(s: number) { return s >= 70 ? 'bg-emerald-500'   : s >= 40 ? 'bg-amber-400'   : 'bg-slate-300'; }
+  scoreColor(s: number)    { return s >= 70 ? 'text-emerald-400' : s >= 40 ? 'text-amber-400' : 'text-slate-500'; }
+  scoreBarColor(s: number) { return s >= 70 ? 'bg-emerald-500'   : s >= 40 ? 'bg-amber-400'   : 'bg-slate-600'; }
   confidenceCls(c: string) {
-    if (c === 'Alta')  return 'bg-emerald-100 text-emerald-700';
-    if (c === 'Media') return 'bg-amber-100 text-amber-700';
-    return 'bg-slate-100 text-slate-500';
+    if (c === 'Alta')  return 'bg-emerald-500/15 text-emerald-400';
+    if (c === 'Media') return 'bg-amber-500/15 text-amber-400';
+    return 'bg-white/5 text-slate-500';
   }
 
   ngOnDestroy() { this.recognition?.stop(); }

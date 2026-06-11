@@ -16,10 +16,13 @@ interface DashboardStats { totalTramites: number; byStatus: Record<string, numbe
     <div class="mx-auto max-w-7xl p-6">
       <div class="mb-6 flex items-center justify-between gap-4">
         <div>
-          <h2 class="text-3xl font-bold text-slate-900">Reportes</h2>
+          <h2 class="text-3xl font-bold text-slate-100">Reportes</h2>
           <p class="text-sm text-slate-500">Resumen general del sistema.</p>
         </div>
-        <div class="rounded-full border px-3 py-1 text-sm" [class.border-emerald-200]="realtimeConnected()" [class.bg-emerald-50]="realtimeConnected()" [class.text-emerald-700]="realtimeConnected()" [class.border-slate-200]="!realtimeConnected()" [class.bg-slate-100]="!realtimeConnected()" [class.text-slate-600]="!realtimeConnected()">
+        <div class="rounded-full border px-3 py-1 text-sm"
+             [ngClass]="realtimeConnected()
+               ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
+               : 'border-white/10 bg-white/5 text-slate-500'">
           {{ realtimeConnected() ? 'Tiempo real activo' : 'Tiempo real desconectado' }}
         </div>
       </div>
@@ -28,75 +31,95 @@ interface DashboardStats { totalTramites: number; byStatus: Record<string, numbe
         <div class="flex justify-center py-16"><mat-spinner /></div>
       } @else {
         <div class="mb-6">
-          <div class="rounded-2xl border border-slate-200 bg-white p-5"><div class="text-sm text-slate-500">Total tramites</div>
-          <div class="mt-2 text-4xl font-bold text-slate-900">{{ stats()?.totalTramites ?? 0 }}</div></div>
+          <div class="rounded-2xl border border-white/5 bg-[#111118] p-5">
+            <div class="text-sm text-slate-500">Total tramites</div>
+            <div class="mt-2 text-4xl font-bold text-slate-100">{{ stats()?.totalTramites ?? 0 }}</div>
+          </div>
         </div>
 
         <div class="grid gap-6 xl:grid-cols-2">
-          <section class="rounded-2xl border border-slate-200 bg-white p-5">
-            <h3 class="mb-4 text-lg font-semibold text-slate-900">Tramites por estado</h3>
+          <section class="rounded-2xl border border-white/5 bg-[#111118] p-5">
+            <h3 class="mb-4 text-lg font-semibold text-slate-100">Tramites por estado</h3>
             <div class="space-y-3">
               @for (item of statusEntries(); track item.key) {
-                <div class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
-                  <span class="font-medium text-slate-700">{{ item.key }}</span>
-                  <span class="font-bold text-slate-900">{{ item.value }}</span>
+                <div class="flex items-center justify-between rounded-xl bg-white/[0.03] px-4 py-3">
+                  <span class="font-medium text-slate-300">{{ item.key }}</span>
+                  <span class="font-bold text-slate-100">{{ item.value }}</span>
                 </div>
               } @empty {
-                <div class="text-sm text-slate-400">Sin datos</div>
+                <div class="text-sm text-slate-600">Sin datos</div>
               }
             </div>
           </section>
 
-          <section class="rounded-2xl border border-slate-200 bg-white p-5">
-            <h3 class="mb-4 text-lg font-semibold text-slate-900">Departamentos con mayor flujo</h3>
+          <section class="rounded-2xl border border-white/5 bg-[#111118] p-5">
+            <h3 class="mb-4 text-lg font-semibold text-slate-100">Departamentos con mayor flujo</h3>
             <div class="space-y-3">
               @for (item of topDepartments(); track item.departmentName) {
-                <div class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
-                  <span class="font-medium text-slate-700">{{ item.departmentName }}</span>
-                  <span class="font-bold text-indigo-600">{{ item.total }}</span>
+                <div class="flex items-center justify-between rounded-xl bg-white/[0.03] px-4 py-3">
+                  <span class="font-medium text-slate-300">{{ item.departmentName }}</span>
+                  <span class="font-bold text-indigo-400">{{ item.total }}</span>
                 </div>
               } @empty {
-                <div class="text-sm text-slate-400">Sin datos</div>
+                <div class="text-sm text-slate-600">Sin datos</div>
               }
             </div>
           </section>
 
-          <section class="rounded-2xl border border-slate-200 bg-white p-5 xl:col-span-2">
-            <h3 class="mb-4 text-lg font-semibold text-slate-900">Antes del Tiempo Estimado</h3>
+          <section class="rounded-2xl border border-white/5 bg-[#111118] p-5 xl:col-span-2">
+            <h3 class="mb-4 text-lg font-semibold text-slate-100">Antes del Tiempo Estimado</h3>
             <div class="overflow-x-auto">
               <table class="w-full text-sm">
-                <thead class="border-b border-slate-200 text-left text-slate-500">
-                  <tr><th class="py-2">Departamento</th><th class="py-2">Rol</th><th class="py-2">Cantidad</th>
-                  <th class="py-2">Promedio (min)</th><th class="py-2">Estimado (min)</th></tr>
+                <thead class="border-b border-white/5 text-left text-slate-500 text-xs uppercase tracking-wider">
+                  <tr>
+                    <th class="py-2 pr-4">Departamento</th>
+                    <th class="py-2 pr-4">Rol</th>
+                    <th class="py-2 pr-4">Cantidad</th>
+                    <th class="py-2 pr-4">Promedio (min)</th>
+                    <th class="py-2">Estimado (min)</th>
+                  </tr>
                 </thead>
                 <tbody>
                   @for (item of tempranoRoles(); track item.departmentName + item.jobRoleName) {
-                    <tr class="border-b border-slate-100"><td class="py-2">{{ item.departmentName }}</td>
-                    <td class="py-2">{{ item.jobRoleName }}</td><td class="py-2 text-emerald-600">{{ item.finishedEarly }}</td>
-                    <td class="py-2">{{ item.averageDurationMinutes }}</td><td class="py-2">{{ item.averageAvgMinutes }}</td></tr>
+                    <tr class="border-t border-white/5 hover:bg-white/[0.03]">
+                      <td class="py-2 pr-4 text-slate-300">{{ item.departmentName }}</td>
+                      <td class="py-2 pr-4 text-slate-300">{{ item.jobRoleName }}</td>
+                      <td class="py-2 pr-4 text-emerald-400">{{ item.finishedEarly }}</td>
+                      <td class="py-2 pr-4 text-slate-300">{{ item.averageDurationMinutes }}</td>
+                      <td class="py-2 text-slate-300">{{ item.averageAvgMinutes }}</td>
+                    </tr>
                   } @empty {
-                    <tr><td colspan="5" class="py-4 text-center text-slate-400">Sin datos</td></tr>
+                    <tr><td colspan="5" class="py-4 text-center text-slate-600">Sin datos</td></tr>
                   }
                 </tbody>
               </table>
             </div>
           </section>
 
-          <section class="rounded-2xl border border-slate-200 bg-white p-5 xl:col-span-2">
-            <h3 class="mb-4 text-lg font-semibold text-slate-900">Despues del Tiempo Estimado</h3>
+          <section class="rounded-2xl border border-white/5 bg-[#111118] p-5 xl:col-span-2">
+            <h3 class="mb-4 text-lg font-semibold text-slate-100">Despues del Tiempo Estimado</h3>
             <div class="overflow-x-auto">
               <table class="w-full text-sm">
-                <thead class="border-b border-slate-200 text-left text-slate-500">
-                  <tr><th class="py-2">Departamento</th><th class="py-2">Rol</th><th class="py-2">Cantidad</th>\
-                  <th class="py-2">Promedio (min)</th><th class="py-2">Estimado (min)</th></tr>
+                <thead class="border-b border-white/5 text-left text-slate-500 text-xs uppercase tracking-wider">
+                  <tr>
+                    <th class="py-2 pr-4">Departamento</th>
+                    <th class="py-2 pr-4">Rol</th>
+                    <th class="py-2 pr-4">Cantidad</th>
+                    <th class="py-2 pr-4">Promedio (min)</th>
+                    <th class="py-2">Estimado (min)</th>
+                  </tr>
                 </thead>
                 <tbody>
                   @for (item of tardeRoles(); track item.departmentName + item.jobRoleName) {
-                    <tr class="border-b border-slate-100"><td class="py-2">{{ item.departmentName }}</td>
-                    <td class="py-2">{{ item.jobRoleName }}</td><td class="py-2 text-rose-600">{{ item.finishedLate }}</td>
-                    <td class="py-2">{{ item.averageDurationMinutes }}</td><td class="py-2">{{ item.averageAvgMinutes }}</td></tr>
+                    <tr class="border-t border-white/5 hover:bg-white/[0.03]">
+                      <td class="py-2 pr-4 text-slate-300">{{ item.departmentName }}</td>
+                      <td class="py-2 pr-4 text-slate-300">{{ item.jobRoleName }}</td>
+                      <td class="py-2 pr-4 text-rose-400">{{ item.finishedLate }}</td>
+                      <td class="py-2 pr-4 text-slate-300">{{ item.averageDurationMinutes }}</td>
+                      <td class="py-2 text-slate-300">{{ item.averageAvgMinutes }}</td>
+                    </tr>
                   } @empty {
-                    <tr><td colspan="5" class="py-4 text-center text-slate-400">Sin datos</td></tr>
+                    <tr><td colspan="5" class="py-4 text-center text-slate-600">Sin datos</td></tr>
                   }
                 </tbody>
               </table>
