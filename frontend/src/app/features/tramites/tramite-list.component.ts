@@ -43,38 +43,55 @@ declare global {
   template: `
     <div class="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-6 py-6">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <h2 class="text-3xl font-bold text-slate-900">Tramites</h2>
-        <button mat-flat-button color="primary" (click)="openCreate()"><mat-icon>add</mat-icon> Nuevo Tramite</button>
+        <h2 class="text-3xl font-bold text-slate-100">Tramites</h2>
+        <button class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 cursor-pointer" (click)="openCreate()">
+          <span class="flex items-center gap-1.5"><mat-icon class="!h-4 !w-4 !text-base">add</mat-icon> Nuevo Tramite</span>
+        </button>
       </div>
 
-      <div class="max-w-[320px]">
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Buscar por codigo</mat-label>
-          <input matInput [ngModel]="codeFilter()" (ngModelChange)="codeFilter.set($event)" placeholder="Ej: TRM00068">
-          @if (codeFilter().trim()) { <button mat-icon-button matSuffix (click)="codeFilter.set('')"><mat-icon>close</mat-icon></button> }
-        </mat-form-field>
+      <div class="max-w-[320px] relative">
+        <input
+          class="w-full rounded-xl border border-white/8 bg-[#111118] px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none transition focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/20"
+          placeholder="Buscar por codigo, ej: TRM00068"
+          [ngModel]="codeFilter()"
+          (ngModelChange)="codeFilter.set($event)">
+        @if (codeFilter().trim()) {
+          <button class="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded p-0.5 text-slate-500 transition hover:text-slate-200" (click)="codeFilter.set('')">
+            <mat-icon class="!h-4 !w-4 !text-base">close</mat-icon>
+          </button>
+        }
       </div>
 
-      @if (loading()) { <div class="flex justify-center py-16"><mat-spinner /></div> }
+      @if (loading()) {
+        <div class="flex flex-col gap-2">
+          @for (_ of [1,2,3,4,5]; track $index) {
+            <div class="h-12 animate-pulse rounded-xl bg-[#111118]"></div>
+          }
+        </div>
+      }
       @else {
-        <div class="overflow-hidden rounded-3xl bg-white shadow-sm">
+        <div class="overflow-hidden rounded-2xl border border-white/5 bg-[#111118]">
           <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
-              <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <thead class="border-b border-white/5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr><th class="px-4 py-3">Codigo</th><th class="px-4 py-3">Titulo</th><th class="px-4 py-3">Estado</th><th class="px-4 py-3">Workflow</th><th class="px-4 py-3">Fecha</th><th class="px-4 py-3"></th></tr>
               </thead>
               <tbody>
                 @for (p of filteredTramites(); track p.id) {
-                  <tr class="border-t border-slate-100 hover:bg-slate-50">
-                    <td class="px-4 py-3"><code class="rounded bg-slate-100 px-2 py-1 text-xs">{{ p.code }}</code></td>
-                    <td class="px-4 py-3">{{ p.title }}</td>
+                  <tr class="border-t border-white/5 hover:bg-white/[0.03]">
+                    <td class="px-4 py-3"><code class="rounded bg-white/8 px-2 py-1 font-mono text-xs text-slate-400">{{ p.code }}</code></td>
+                    <td class="px-4 py-3 text-slate-300">{{ p.title }}</td>
                     <td class="px-4 py-3"><span class="rounded-full px-3 py-1 text-xs font-semibold" [ngClass]="statusClass(p.status)">{{ p.status }}</span></td>
-                    <td class="px-4 py-3">{{ wfName(p.workflowId) }}</td>
-                    <td class="px-4 py-3">{{ p.createdAt | date:'dd/MM/yyyy' }}</td>
-                    <td class="px-4 py-3"><button mat-icon-button [routerLink]="[p.id]"><mat-icon>visibility</mat-icon></button></td>
+                    <td class="px-4 py-3 text-slate-300">{{ wfName(p.workflowId) }}</td>
+                    <td class="px-4 py-3 text-slate-500">{{ p.createdAt | date:'dd/MM/yyyy' }}</td>
+                    <td class="px-4 py-3">
+                      <button class="cursor-pointer rounded-lg p-1.5 text-slate-500 transition hover:bg-white/8 hover:text-slate-200" [routerLink]="[p.id]" aria-label="Ver detalle">
+                        <mat-icon class="!h-4 !w-4 !text-base">visibility</mat-icon>
+                      </button>
+                    </td>
                   </tr>
                 }
-                @empty { <tr><td colspan="6" class="px-4 py-10 text-center text-slate-400">No hay tramites</td></tr> }
+                @empty { <tr><td colspan="6" class="px-4 py-10 text-center text-slate-500">No hay tramites</td></tr> }
               </tbody>
             </table>
           </div>
@@ -82,9 +99,9 @@ declare global {
       }
 
       @if (showForm()) {
-        <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/40 px-4" (click)="closeCreate()">
-          <mat-card class="max-h-[85vh] w-full max-w-[540px] overflow-auto rounded-3xl p-6 shadow-2xl" (click)="$event.stopPropagation()">
-            <h3 class="mb-4 text-xl font-semibold text-slate-900">Nuevo Tramite</h3>
+        <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 px-4" (click)="closeCreate()">
+          <div class="max-h-[85vh] w-full max-w-[540px] overflow-auto rounded-2xl border border-white/8 bg-[#1a1a24] p-6 shadow-2xl backdrop-blur-sm" (click)="$event.stopPropagation()">
+            <h3 class="mb-4 text-xl font-semibold text-slate-100">Nuevo Tramite</h3>
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Workflow</mat-label>
               <mat-select [(ngModel)]="formWorkflowId" (ngModelChange)="onWorkflowChange($event)">
@@ -92,24 +109,29 @@ declare global {
               </mat-select>
             </mat-form-field>
 
-            @if (loadingWorkflowDetail()) { <div class="flex justify-center pb-5 pt-2"><mat-spinner diameter="24" /></div> }
+            @if (loadingWorkflowDetail()) {
+              <div class="flex flex-col gap-2 pb-5 pt-2">
+                <div class="h-8 animate-pulse rounded-xl bg-white/5"></div>
+                <div class="h-8 animate-pulse rounded-xl bg-white/5"></div>
+              </div>
+            }
             @else if (entryNodo()) {
-              <div class="mb-4 text-sm text-slate-600"><strong>Etapa:</strong> {{ entryNodo()!.name }}</div>
+              <div class="mb-4 text-sm text-slate-500"><strong class="text-slate-300">Etapa:</strong> {{ entryNodo()!.name }}</div>
               @if (entryFormFields().length) {
                 <div class="mb-3 flex flex-col gap-2">
-                  <h4 class="text-sm font-semibold text-slate-900">{{ entryNodo()!.formDefinition?.title || 'Formulario' }}</h4>
+                  <h4 class="text-sm font-semibold text-slate-100">{{ entryNodo()!.formDefinition?.title || 'Formulario' }}</h4>
                   <div class="flex flex-wrap gap-2">
-                    <button mat-stroked-button type="button" [disabled]="voiceLoading()" (click)="toggleVoiceCapture()">
-                      <mat-icon>{{ voiceListening() ? 'mic_off' : 'mic' }}</mat-icon>
+                    <button class="rounded-xl border border-white/10 px-3 py-2 text-sm text-slate-300 transition hover:border-indigo-500/40 hover:text-indigo-300 cursor-pointer flex items-center gap-1.5" type="button" [disabled]="voiceLoading()" (click)="toggleVoiceCapture()">
+                      <mat-icon class="!h-4 !w-4 !text-base">{{ voiceListening() ? 'mic_off' : 'mic' }}</mat-icon>
                       {{ voiceListening() ? 'Detener voz' : 'Llenar por voz' }}
                     </button>
-                    <button mat-flat-button color="accent" type="button" [disabled]="tfVoiceLoading()" (click)="toggleTfVoiceCapture()" style="background:#6366f1;color:#fff">
-                      <mat-icon>{{ tfVoiceListening() ? 'mic_off' : 'psychology' }}</mat-icon>
+                    <button class="rounded-xl border border-white/10 px-3 py-2 text-sm text-slate-300 transition hover:border-indigo-500/40 hover:text-indigo-300 cursor-pointer flex items-center gap-1.5" type="button" [disabled]="tfVoiceLoading()" (click)="toggleTfVoiceCapture()">
+                      <mat-icon class="!h-4 !w-4 !text-base">{{ tfVoiceListening() ? 'mic_off' : 'psychology' }}</mat-icon>
                       {{ tfVoiceListening() ? 'Detener TF...' : tfVoiceLoading() ? 'Analizando...' : 'Llenar con TF' }}
                     </button>
                   </div>
                   @if (tfVoiceTranscript()) {
-                    <div class="rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2 text-xs text-indigo-700">
+                    <div class="rounded-xl border border-indigo-500/20 bg-indigo-500/10 px-3 py-2 text-xs text-indigo-300">
                       <strong>TF escuchando:</strong> {{ tfVoiceTranscript() }}
                     </div>
                   }
@@ -117,12 +139,12 @@ declare global {
                 @for (field of entryFormFields(); track field.id) {
                   @if (field.type === 'FILE') {
                     <div class="mb-4 flex flex-col gap-2">
-                      <label class="text-sm font-medium text-slate-700">{{ field.name }}</label>
-                      <input class="text-sm text-slate-700" type="file" multiple (change)="onFilesSelected(field, $event)">
+                      <label class="text-sm font-medium text-slate-300">{{ field.name }}</label>
+                      <input class="text-sm text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-white/8 file:px-3 file:py-1.5 file:text-xs file:text-slate-300 file:cursor-pointer" type="file" multiple (change)="onFilesSelected(field, $event)">
                       @if (fileItemsForField(field).length) {
                         <div class="flex flex-col gap-1">
                           @for (file of fileItemsForField(field); track file.storedName) {
-                            <button type="button" class="bg-transparent p-0 text-left text-xs text-indigo-600 underline" (click)="downloadFile(file)">{{ fileLabel(file) }}</button>
+                            <button type="button" class="bg-transparent p-0 text-left text-xs text-indigo-400 underline cursor-pointer" (click)="downloadFile(file)">{{ fileLabel(file) }}</button>
                           }
                         </div>
                       }
@@ -130,13 +152,13 @@ declare global {
                   } @else if (field.type === 'GRID') {
                     <div class="mb-4">
                       <div class="mb-2 flex items-center justify-between gap-3">
-                        <label class="text-sm font-medium text-slate-700">{{ field.name }}</label>
-                        <button mat-stroked-button type="button" (click)="addGridRow(field)">Agregar fila</button>
+                        <label class="text-sm font-medium text-slate-300">{{ field.name }}</label>
+                        <button class="rounded-xl border border-white/10 px-3 py-1.5 text-xs text-slate-300 transition hover:border-indigo-500/40 hover:text-indigo-300 cursor-pointer" type="button" (click)="addGridRow(field)">Agregar fila</button>
                       </div>
                       @if (gridColumns(field).length) {
-                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                        <div class="overflow-x-auto rounded-xl border border-white/5">
                           <table class="min-w-full text-sm">
-                            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            <thead class="border-b border-white/5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                               <tr>
                                 @for (column of gridColumns(field); track column.id) {
                                   <th class="px-3 py-2">{{ column.name }}</th>
@@ -146,14 +168,14 @@ declare global {
                             </thead>
                             <tbody>
                               @for (row of gridRows(field); track rowIndex; let rowIndex = $index) {
-                                <tr class="border-t border-slate-100">
+                                <tr class="border-t border-white/5">
                                 @for (column of gridColumns(field); track column.id) {
                                   <td class="px-3 py-2">
                                       @if (column.type === 'CHECKBOX') {
                                         <mat-checkbox [ngModel]="toBoolean(row[column.name])" (ngModelChange)="setGridCellValue(field, rowIndex, column, $event)"></mat-checkbox>
                                       } @else {
                                         <input
-                                          class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-indigo-400"
+                                          class="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none focus:border-indigo-500/60"
                                           [type]="inputType(column.type)"
                                           [ngModel]="row[column.name] ?? ''"
                                           (ngModelChange)="setGridCellValue(field, rowIndex, column, $event)">
@@ -161,27 +183,27 @@ declare global {
                                     </td>
                                   }
                                   <td class="px-3 py-2 text-right">
-                                    <button mat-button color="warn" type="button" (click)="removeGridRow(field, rowIndex)">Quitar</button>
+                                    <button class="rounded-lg px-2 py-1 text-xs text-rose-400 transition hover:bg-rose-500/10 cursor-pointer" type="button" (click)="removeGridRow(field, rowIndex)">Quitar</button>
                                   </td>
                                 </tr>
                               } @empty {
                                 <tr>
-                                  <td class="px-3 py-4 text-center text-sm text-slate-400" [attr.colspan]="gridColumns(field).length + 1">Sin filas</td>
+                                  <td class="px-3 py-4 text-center text-sm text-slate-500" [attr.colspan]="gridColumns(field).length + 1">Sin filas</td>
                                 </tr>
                               }
                             </tbody>
                           </table>
                         </div>
                       } @else {
-                        <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+                        <div class="rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-3 text-sm text-slate-500">
                           Esta grilla no tiene columnas configuradas.
                         </div>
                       }
                     </div>
                   } @else if (field.type === 'CHECKBOX') {
-                    <div class="mb-4 rounded-xl border border-slate-200 px-3 py-2">
+                    <div class="mb-4 rounded-xl border border-white/5 px-3 py-2">
                       <mat-checkbox [ngModel]="toBoolean(fieldValue(field))" (ngModelChange)="setFieldValue(field, $event)">
-                        {{ field.name }}
+                        <span class="text-slate-300">{{ field.name }}</span>
                       </mat-checkbox>
                     </div>
                   } @else {
@@ -202,10 +224,10 @@ declare global {
             }
 
             <div class="mt-2 flex justify-end gap-2">
-              <button mat-button (click)="closeCreate()">Cancelar</button>
-              <button mat-flat-button color="primary" (click)="save()" [disabled]="loadingWorkflowDetail() || submitting()">{{ submitting() ? 'Enviando...' : 'Enviar' }}</button>
+              <button class="rounded-xl px-4 py-2 text-sm text-slate-400 transition hover:text-slate-200 cursor-pointer" (click)="closeCreate()">Cancelar</button>
+              <button class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" (click)="save()" [disabled]="loadingWorkflowDetail() || submitting()">{{ submitting() ? 'Enviando...' : 'Enviar' }}</button>
             </div>
-          </mat-card>
+          </div>
         </div>
       }
     </div>
@@ -265,7 +287,12 @@ export class TramiteListComponent implements OnInit {
   }
 
   statusClass(s: string) {
-    return ({ PENDIENTE: 'bg-amber-100 text-amber-800', EN_PROGRESO: 'bg-blue-100 text-blue-800', COMPLETADO: 'bg-emerald-100 text-emerald-800', RECHAZADO: 'bg-rose-100 text-rose-800' } as Record<string, string>)[s] ?? 'bg-slate-100 text-slate-700';
+    return ({
+      PENDIENTE:   'bg-amber-500/15 text-amber-400',
+      EN_PROGRESO: 'bg-blue-500/15 text-blue-400',
+      COMPLETADO:  'bg-emerald-500/15 text-emerald-400',
+      RECHAZADO:   'bg-rose-500/15 text-rose-400',
+    } as Record<string, string>)[s] ?? 'bg-slate-500/15 text-slate-400';
   }
 
   wfName(id: string) { return this.workflows().find(w => w.id === id)?.name || id; }
