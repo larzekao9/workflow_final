@@ -130,3 +130,35 @@ html, body {
 .mat-mdc-form-field .mdc-notched-outline__trailing {
   border-radius: 8px !important;
 }
+
+/* ── Workflow editor: restore light Material theme ──────────────────── */
+app-workflow-editor {
+  --mdc-outlined-text-field-input-text-color: rgba(0,0,0,0.87);
+  --mdc-outlined-text-field-disabled-input-text-color: rgba(0,0,0,0.38);
+  --mdc-outlined-text-field-label-text-color: rgba(0,0,0,0.6);
+  --mdc-outlined-text-field-focus-label-text-color: #6366f1;
+  --mdc-outlined-text-field-outline-color: rgba(0,0,0,0.38);
+  --mdc-outlined-text-field-hover-outline-color: rgba(0,0,0,0.87);
+  --mdc-outlined-text-field-focus-outline-color: #6366f1;
+  --mdc-outlined-text-field-caret-color: #6366f1;
+  --mat-select-enabled-trigger-text-color: rgba(0,0,0,0.87);
+  --mat-select-placeholder-text-color: rgba(0,0,0,0.6);
+
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
+    border-color: rgba(0,0,0,0.38) !important;
+  }
+
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled):hover .mdc-notched-outline__leading,
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled):hover .mdc-notched-outline__notch,
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled):hover .mdc-notched-outline__trailing {
+    border-color: rgba(0,0,0,0.87) !important;
+  }
+
+  .mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__leading,
+  .mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__notch,
+  .mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__trailing {
+    border-color: #6366f1 !important;
+  }
+}
