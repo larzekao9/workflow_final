@@ -39,38 +39,41 @@ const PEER_COLORS = ['#6366f1','#f59e0b','#10b981','#ef4444','#8b5cf6','#06b6d4'
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule, MatProgressSpinnerModule],
   styles: [`:host { display: block; height: 100%; }
-    .sheet-wrap { height: 100%; overflow: auto; background: #fff; }
+    .sheet-wrap { height: 100%; overflow: auto; background: #0a0a0f; }
     .sheet-table { border-collapse: collapse; font-size: 13px; }
-    .s-corner { background:#f1f5f9; border:1px solid #cbd5e1; width:48px; min-width:48px; position:sticky; top:0; left:0; z-index:20; }
-    .s-col { background:#f1f5f9; font-weight:600; text-align:center; padding:4px 6px; border:1px solid #cbd5e1; min-width:90px; position:sticky; top:0; z-index:10; user-select:none; font-size:12px; color:#64748b; }
-    .s-row { background:#f1f5f9; font-weight:600; text-align:right; padding:4px 8px; border:1px solid #cbd5e1; width:48px; min-width:48px; position:sticky; left:0; z-index:5; user-select:none; font-size:12px; color:#64748b; }
-    .s-td { border:1px solid #e2e8f0; padding:0; }
-    .s-inp { display:block; width:100%; height:100%; min-height:26px; padding:3px 7px; background:transparent; border:none; outline:none; font-size:13px; font-family:inherit; box-sizing:border-box; }
-    .s-inp:focus { background:#eff6ff; box-shadow:inset 0 0 0 2px #3b82f6; }
-    .ss-btn { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:8px; font-size:13px; font-weight:500; background:transparent; border:1px solid #e2e8f0; cursor:pointer; color:#475569; transition:background .15s,border-color .15s; }
-    .ss-btn:hover:not(:disabled) { background:#f1f5f9; border-color:#94a3b8; }
+    .s-corner { background:#1a1a24; border:1px solid rgba(255,255,255,0.08); width:48px; min-width:48px; position:sticky; top:0; left:0; z-index:20; }
+    .s-col { background:#1a1a24; font-weight:600; text-align:center; padding:4px 6px; border:1px solid rgba(255,255,255,0.08); min-width:90px; position:sticky; top:0; z-index:10; user-select:none; font-size:12px; color:#64748b; }
+    .s-row { background:#1a1a24; font-weight:600; text-align:right; padding:4px 8px; border:1px solid rgba(255,255,255,0.08); width:48px; min-width:48px; position:sticky; left:0; z-index:5; user-select:none; font-size:12px; color:#64748b; }
+    .s-td { border:1px solid rgba(255,255,255,0.05); padding:0; }
+    .s-inp { display:block; width:100%; height:100%; min-height:26px; padding:3px 7px; background:transparent; border:none; outline:none; font-size:13px; font-family:inherit; box-sizing:border-box; color:#cbd5e1; }
+    .s-inp:focus { background:rgba(99,102,241,0.08); box-shadow:inset 0 0 0 2px #6366f1; }
+    .ss-btn { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:8px; font-size:13px; font-weight:500; background:transparent; border:1px solid rgba(255,255,255,0.08); cursor:pointer; color:#94a3b8; transition:background .15s,border-color .15s; }
+    .ss-btn:hover:not(:disabled) { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.15); color:#e2e8f0; }
     .ss-btn:disabled { opacity:.35; cursor:default; }
     .ss-btn mat-icon { font-size:16px; height:16px; width:16px; line-height:16px; }
-    .ss-sep { width:1px; height:20px; background:#e2e8f0; margin:0 4px; }
+    .ss-sep { width:1px; height:20px; background:rgba(255,255,255,0.08); margin:0 4px; }
+    .toolbar-btn { display:inline-flex; align-items:center; justify-content:center; padding:6px; border-radius:8px; background:transparent; border:none; cursor:pointer; color:#94a3b8; transition:background .15s,color .15s; }
+    .toolbar-btn:hover { background:rgba(255,255,255,0.06); color:#e2e8f0; }
+    .toolbar-btn.active { background:rgba(99,102,241,0.15); color:#a5b4fc; }
   `],
   template: `
-    <div class="flex h-screen flex-col bg-slate-50">
+    <div class="flex h-screen flex-col bg-[#111118]">
 
       <!-- Topbar -->
-      <div class="flex flex-wrap items-center gap-3 border-b border-slate-200 bg-white px-4 py-2 shadow-sm">
-        <button (click)="goBack()" class="rounded-xl p-1.5 text-slate-500 transition hover:bg-slate-100 shrink-0">
+      <div class="flex flex-wrap items-center gap-3 border-b border-white/5 bg-[#111118] px-4 py-2 shrink-0">
+        <button (click)="goBack()" class="rounded-xl p-1.5 text-slate-400 transition hover:bg-white/[0.06] hover:text-slate-100 shrink-0" title="Volver">
           <mat-icon>arrow_back</mat-icon>
         </button>
 
         @if (docCtx()) {
           <div class="flex-1 min-w-0">
-            <h1 class="truncate text-base font-bold text-slate-900 leading-tight">{{ docCtx()!.title }}</h1>
-            <p class="text-xs text-slate-400">{{ connected() ? 'Conectado' : 'Desconectado' }} · {{ peers().length }} editando</p>
+            <h1 class="truncate text-base font-bold text-slate-100 leading-tight">{{ docCtx()!.title }}</h1>
+            <p class="text-xs text-slate-500">{{ connected() ? 'Conectado' : 'Desconectado' }} · {{ peers().length }} editando</p>
           </div>
 
           <div class="flex -space-x-2">
             @for (peer of peers(); track peer.userId) {
-              <div class="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white text-xs font-bold text-white"
+              <div class="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#111118] text-xs font-bold text-white"
                    [style.background]="peer.color" [title]="peer.userName">
                 {{ peer.userName.charAt(0).toUpperCase() }}
               </div>
@@ -86,18 +89,18 @@ const PEER_COLORS = ['#6366f1','#f59e0b','#10b981','#ef4444','#8b5cf6','#06b6d4'
               <button class="ss-btn" [disabled]="!activeCell()" (click)="deleteSelectedCol()"><mat-icon>remove</mat-icon> Columna</button>
             </div>
           } @else {
-            <div class="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-2 py-1 flex-wrap">
-              <button (click)="fmt('bold')"        [class.bg-indigo-100]="editor?.isActive('bold')"              class="toolbar-btn" title="Negrita"><mat-icon class="!text-[16px]">format_bold</mat-icon></button>
-              <button (click)="fmt('italic')"      [class.bg-indigo-100]="editor?.isActive('italic')"            class="toolbar-btn" title="Cursiva"><mat-icon class="!text-[16px]">format_italic</mat-icon></button>
-              <div class="mx-1 h-5 w-px bg-slate-200"></div>
-              <button (click)="fmt('h1')"          [class.bg-indigo-100]="editor?.isActive('heading',{level:1})" class="toolbar-btn text-xs font-bold">H1</button>
-              <button (click)="fmt('h2')"          [class.bg-indigo-100]="editor?.isActive('heading',{level:2})" class="toolbar-btn text-xs font-bold">H2</button>
-              <button (click)="fmt('h3')"          [class.bg-indigo-100]="editor?.isActive('heading',{level:3})" class="toolbar-btn text-xs font-bold">H3</button>
-              <div class="mx-1 h-5 w-px bg-slate-200"></div>
-              <button (click)="fmt('bulletList')"  [class.bg-indigo-100]="editor?.isActive('bulletList')"        class="toolbar-btn" title="Lista"><mat-icon class="!text-[16px]">format_list_bulleted</mat-icon></button>
-              <button (click)="fmt('orderedList')" [class.bg-indigo-100]="editor?.isActive('orderedList')"       class="toolbar-btn" title="Lista num."><mat-icon class="!text-[16px]">format_list_numbered</mat-icon></button>
-              <button (click)="fmt('blockquote')"  [class.bg-indigo-100]="editor?.isActive('blockquote')"        class="toolbar-btn" title="Cita"><mat-icon class="!text-[16px]">format_quote</mat-icon></button>
-              <div class="mx-1 h-5 w-px bg-slate-200"></div>
+            <div class="flex items-center gap-1 rounded-xl border border-white/5 bg-white/[0.03] px-2 py-1 flex-wrap">
+              <button (click)="fmt('bold')"        [class.active]="editor?.isActive('bold')"              class="toolbar-btn" title="Negrita"><mat-icon class="!text-[16px]">format_bold</mat-icon></button>
+              <button (click)="fmt('italic')"      [class.active]="editor?.isActive('italic')"            class="toolbar-btn" title="Cursiva"><mat-icon class="!text-[16px]">format_italic</mat-icon></button>
+              <div class="mx-1 h-5 w-px bg-white/5"></div>
+              <button (click)="fmt('h1')"          [class.active]="editor?.isActive('heading', h1Level)"  class="toolbar-btn text-xs font-bold">H1</button>
+              <button (click)="fmt('h2')"          [class.active]="editor?.isActive('heading', h2Level)"  class="toolbar-btn text-xs font-bold">H2</button>
+              <button (click)="fmt('h3')"          [class.active]="editor?.isActive('heading', h3Level)"  class="toolbar-btn text-xs font-bold">H3</button>
+              <div class="mx-1 h-5 w-px bg-white/5"></div>
+              <button (click)="fmt('bulletList')"  [class.active]="editor?.isActive('bulletList')"        class="toolbar-btn" title="Lista"><mat-icon class="!text-[16px]">format_list_bulleted</mat-icon></button>
+              <button (click)="fmt('orderedList')" [class.active]="editor?.isActive('orderedList')"       class="toolbar-btn" title="Lista num."><mat-icon class="!text-[16px]">format_list_numbered</mat-icon></button>
+              <button (click)="fmt('blockquote')"  [class.active]="editor?.isActive('blockquote')"        class="toolbar-btn" title="Cita"><mat-icon class="!text-[16px]">format_quote</mat-icon></button>
+              <div class="mx-1 h-5 w-px bg-white/5"></div>
               <button (click)="fmt('undo')" class="toolbar-btn" title="Deshacer"><mat-icon class="!text-[16px]">undo</mat-icon></button>
               <button (click)="fmt('redo')" class="toolbar-btn" title="Rehacer"><mat-icon class="!text-[16px]">redo</mat-icon></button>
             </div>
@@ -108,7 +111,7 @@ const PEER_COLORS = ['#6366f1','#f59e0b','#10b981','#ef4444','#8b5cf6','#06b6d4'
       <!-- Body -->
       <div class="relative flex-1 overflow-hidden">
         @if (loading()) {
-          <div class="absolute inset-0 z-10 flex items-center justify-center bg-slate-50">
+          <div class="absolute inset-0 z-10 flex items-center justify-center bg-[#111118]">
             <mat-spinner [diameter]="36" />
           </div>
         }
@@ -151,7 +154,7 @@ const PEER_COLORS = ['#6366f1','#f59e0b','#10b981','#ef4444','#8b5cf6','#06b6d4'
 
         <!-- TipTap – siempre en DOM; oculto para xlsx -->
         <div class="mx-auto max-w-4xl" [style.display]="isSpreadsheet() ? 'none' : 'block'">
-          <div #editorRef class="tiptap-editor min-h-[calc(100vh-80px)] bg-white shadow-sm ring-1 ring-slate-100 mt-6 mx-4 mb-10 rounded-2xl overflow-hidden"></div>
+          <div #editorRef class="tiptap-editor min-h-[calc(100vh-80px)] bg-[#111118] border border-white/5 mt-6 mx-4 mb-10 rounded-2xl overflow-hidden"></div>
         </div>
       </div>
     </div>
@@ -177,6 +180,12 @@ export class CollabEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   });
 
   editor: Editor | null = null;
+
+  // Heading level objects defined as properties to avoid Angular ICU parser issues
+  readonly h1Level = { level: 1 as const };
+  readonly h2Level = { level: 2 as const };
+  readonly h3Level = { level: 3 as const };
+
   private ydoc!: Y.Doc;
   private stomp!: Client;
   private roomId!: string;

@@ -7,9 +7,9 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [CommonModule, MatIconModule],
   template: `
-    <div class="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-slate-200 bg-slate-50 py-8 text-slate-400">
-      <mat-icon class="!text-[32px]">edit_document</mat-icon>
-      <p class="text-sm text-center">Para editar un documento, abrilo desde la lista de archivos del trámite.</p>
+    <div class="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-white/10 bg-white/[0.03] py-8 text-slate-600">
+      <mat-icon class="!text-[32px] text-slate-500">edit_document</mat-icon>
+      <p class="text-sm text-center text-slate-500">Para editar un documento, abrilo desde la lista de archivos del trámite.</p>
     </div>
   `,
 })
